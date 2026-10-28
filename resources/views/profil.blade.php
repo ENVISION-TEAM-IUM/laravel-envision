@@ -1,48 +1,12 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profil Desa Wisata - Desa Wisata Karangkemiri</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+@extends('layouts.app')
 
-  <div class="app-shell">
-    <!-- Top Navbar Web -->
-    <header class="top-navbar">
-      <div class="navbar-inner">
-        <a href="index.html" class="brand-logo">
-          <div class="brand-mark">
-            <span class="brand-pill-left"></span>
-            <span class="brand-pill-right"></span>
-          </div>
-          <div class="brand-text">
-            Desa Wisata<br>Karangkemiri
-          </div>
-        </a>
+@section('title', 'Profil Desa Wisata - Desa Wisata Karangkemiri')
+@section('nav_active', 'profil')
 
-        <!-- Navigasi Utama Web -->
-        <nav class="web-nav-pill" aria-label="Navigasi Utama">
-          <a href="index.html">Beranda</a>
-          <a href="profil.html" class="active">Profil Desa</a>
-          <a href="destinasi.html">Destinasi</a>
-          <a href="paket-wisata.html">Paket</a>
-          <a href="katalog-umkm.html">UMKM</a>
-          <a href="kontak.html">Kontak</a>
-        </nav>
-
-        <button class="menu-btn" id="menuBtn" aria-label="Buka Menu Navigasi">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      </div>
-    </header>
-
+@section('content')
     <!-- Back Bar -->
     <div class="back-bar">
-      <a href="index.html" class="back-link" aria-label="Kembali">
+      <a href="{{ url('/') }}" class="back-link" aria-label="Kembali">
         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="10"></circle>
           <path d="M12 8l-4 4 4 4"></path>
@@ -61,7 +25,7 @@
 
       <!-- Breadcrumb -->
       <div class="breadcrumb">
-        <a href="index.html">Beranda</a> &nbsp;/&nbsp; <span>Profil Desa Wisata</span>
+        <a href="{{ url('/') }}">Beranda</a> &nbsp;/&nbsp; <span>Profil Desa Wisata</span>
       </div>
 
       <!-- Tentang Kami -->
@@ -118,34 +82,4 @@
         </p>
       </section>
     </main>
-  </div>
-
-  <!-- Slide-out Hamburger Menu Drawer -->
-  <div class="drawer-backdrop" id="drawerBackdrop"></div>
-  <aside class="nav-drawer" id="navDrawer">
-    <div class="drawer-header">
-      <div class="brand-logo">
-        <div class="brand-mark">
-          <span class="brand-pill-left"></span>
-          <span class="brand-pill-right"></span>
-        </div>
-        <div class="brand-text">Desa Wisata<br>Karangkemiri</div>
-      </div>
-      <button class="drawer-close" id="drawerClose" aria-label="Tutup Menu">&times;</button>
-    </div>
-
-    <ul class="drawer-links">
-      <li><a href="index.html"><span>Beranda</span></a></li>
-      <li><a href="profil.html" class="active"><span>Profil Desa Wisata</span></a></li>
-      <li><a href="destinasi.html"><span>Destinasi Wisata</span></a></li>
-      <li><a href="detail-destinasi.html?slug=candi"><span>Detail Destinasi</span></a></li>
-      <li><a href="paket-wisata.html"><span>Paket Wisata</span></a></li>
-      <li><a href="katalog-umkm.html"><span>Katalog UMKM</span></a></li>
-      <li><a href="kontak.html"><span>Kontak &amp; Lokasi</span></a></li>
-      <li><a href="admin-login.html"><span>Login Admin CMS</span></a></li>
-    </ul>
-  </aside>
-
-  <script src="js/app.js"></script>
-</body>
-</html>
+@endsection
