@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Destinasi Wisata - Desa Wisata Karangkemiri</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- Top Navbar Web -->
+    <header class="top-navbar">
+      <div class="navbar-inner">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-mark">
+            <span class="brand-pill-left"></span>
+            <span class="brand-pill-right"></span>
+          </div>
+          <div class="brand-text">
+            Desa Wisata<br>Karangkemiri
+          </div>
+        </a>
+
+        <!-- Navigasi Utama Web -->
+        <nav class="web-nav-pill" aria-label="Navigasi Utama">
+          <a href="index.html">Beranda</a>
+          <a href="profil.html">Profil Desa</a>
+          <a href="destinasi.html" class="active">Destinasi</a>
+          <a href="paket-wisata.html">Paket</a>
+          <a href="katalog-umkm.html">UMKM</a>
+          <a href="kontak.html">Kontak</a>
+        </nav>
+
+        <button class="menu-btn" id="menuBtn" aria-label="Buka Menu Navigasi">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Back Bar -->
+    <div class="back-bar">
+      <a href="index.html" class="back-link" aria-label="Kembali">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 8l-4 4 4 4"></path>
+          <path d="M16 12H8"></path>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Main Content: 03 Destinasi Wisata -->
+    <main class="page-container" style="padding-top: 12px;">
+      <!-- Hero Banner -->
+      <section class="hero-card hero-subpage">
+        <span class="gold-dot"></span>
+        <span class="hero-caption">Destinasi wisata</span>
+      </section>
+
+      <!-- Section Title -->
+      <div style="margin-top: 20px;">
+        <div class="eyebrow">JELAJAHI KARANGKEMIRI</div>
+        <div class="header-with-hours">
+          <h1 class="section-title">Pilih pengalamanmu</h1>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="filter-pills">
+        <button class="filter-pill active" data-filter-btn="semua">Semua</button>
+        <button class="filter-pill" data-filter-btn="alam">Wisata Alam</button>
+        <button class="filter-pill" data-filter-btn="edukasi">Edukasi &amp; Outbound</button>
+        <button class="filter-pill" data-filter-btn="budaya">Budaya</button>
+      </div>
+
+      <!-- Destination Cards (Kotak Rapi Tanpa Panah & Tanpa Rating Publik) -->
+      <div class="cards-stack">
+        <!-- 1. Candi -->
+        <a href="detail-destinasi.html?slug=candi" class="horiz-card" data-category="edukasi">
+          <div class="thumb-box">
+            <span class="gold-dot sm"></span>
+            <span>Candi</span>
+          </div>
+          <div class="card-body">
+            <h2 class="card-title">Wahana Edukasi &amp; Outbound Candi</h2>
+            <p class="card-subtitle">Permainan outbound, ketangkasan kelompok, dan kegiatan edukasi luar ruang</p>
+            <div class="card-meta-bottom">
+              <span class="meta-tag-small">Edukasi &amp; Outbound</span>
+              <span class="price-tag">Konfirmasi Pengelola</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 2. Embung Prabawulan -->
+        <a href="detail-destinasi.html?slug=embung" class="horiz-card" data-category="alam">
+          <div class="thumb-box">
+            <span class="gold-dot sm"></span>
+            <span>Embung</span>
+          </div>
+          <div class="card-body">
+            <h2 class="card-title">Embung Prabawulan</h2>
+            <p class="card-subtitle">Pemandangan danau buatan, bersantai, memancing, dan budidaya ikan</p>
+            <div class="card-meta-bottom">
+              <span class="meta-tag-small">Wisata Alam</span>
+              <span class="price-tag">Konfirmasi Pengelola</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 3. Agro Kelengkeng Thabet -->
+        <a href="detail-destinasi.html?slug=kelengkeng" class="horiz-card" data-category="alam,edukasi">
+          <div class="thumb-box">
+            <span class="gold-dot sm"></span>
+            <span>Buah</span>
+          </div>
+          <div class="card-body">
+            <h2 class="card-title">Agro Kelengkeng Thabet</h2>
+            <p class="card-subtitle">Agrowisata kebun kelengkeng, edukasi budidaya, dan petik buah musiman</p>
+            <div class="card-meta-bottom">
+              <span class="meta-tag-small">Agrowisata</span>
+              <span class="price-tag">Konfirmasi Pengelola</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 4. Petilasan Mbah Siti Benter -->
+        <a href="detail-destinasi.html?slug=petilasan" class="horiz-card" data-category="budaya">
+          <div class="thumb-box">
+            <span class="gold-dot sm"></span>
+            <span>Budaya</span>
+          </div>
+          <div class="card-body">
+            <h2 class="card-title">Petilasan Mbah Siti Benter</h2>
+            <p class="card-subtitle">Wisata sejarah dan pelestarian nilai budaya leluhur masyarakat lokal</p>
+            <div class="card-meta-bottom">
+              <span class="meta-tag-small">Wisata Budaya</span>
+              <span class="price-tag">Konfirmasi Pengelola</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <!-- Slide-out Hamburger Menu Drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="nav-drawer" id="navDrawer">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <div class="brand-mark">
+          <span class="brand-pill-left"></span>
+          <span class="brand-pill-right"></span>
+        </div>
+        <div class="brand-text">Desa Wisata<br>Karangkemiri</div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Tutup Menu">&times;</button>
+    </div>
+
+    <ul class="drawer-links">
+      <li><a href="index.html"><span>Beranda</span></a></li>
+      <li><a href="profil.html"><span>Profil Desa Wisata</span></a></li>
+      <li><a href="destinasi.html" class="active"><span>Destinasi Wisata</span></a></li>
+      <li><a href="detail-destinasi.html?slug=candi"><span>Detail Destinasi</span></a></li>
+      <li><a href="paket-wisata.html"><span>Paket Wisata</span></a></li>
+      <li><a href="katalog-umkm.html"><span>Katalog UMKM</span></a></li>
+      <li><a href="kontak.html"><span>Kontak &amp; Lokasi</span></a></li>
+      <li><a href="admin-login.html"><span>Login Admin CMS</span></a></li>
+    </ul>
+  </aside>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

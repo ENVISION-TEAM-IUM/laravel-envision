@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Katalog UMKM - Desa Wisata Karangkemiri</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- Top Navbar Web -->
+    <header class="top-navbar">
+      <div class="navbar-inner">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-mark">
+            <span class="brand-pill-left"></span>
+            <span class="brand-pill-right"></span>
+          </div>
+          <div class="brand-text">
+            Desa Wisata<br>Karangkemiri
+          </div>
+        </a>
+
+        <!-- Navigasi Utama Web -->
+        <nav class="web-nav-pill" aria-label="Navigasi Utama">
+          <a href="index.html">Beranda</a>
+          <a href="profil.html">Profil Desa</a>
+          <a href="destinasi.html">Destinasi</a>
+          <a href="paket-wisata.html">Paket</a>
+          <a href="katalog-umkm.html" class="active">UMKM</a>
+          <a href="kontak.html">Kontak</a>
+        </nav>
+
+        <button class="menu-btn" id="menuBtn" aria-label="Buka Menu Navigasi">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Back Bar -->
+    <div class="back-bar">
+      <a href="index.html" class="back-link" aria-label="Kembali">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 8l-4 4 4 4"></path>
+          <path d="M16 12H8"></path>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Main Content: 06 Katalog UMKM -->
+    <main class="page-container" style="padding-top: 12px;">
+      <!-- Hero Banner -->
+      <section class="hero-card hero-subpage">
+        <span class="gold-dot"></span>
+        <span class="hero-caption">Produk unggulan lokal</span>
+      </section>
+
+      <!-- Section Heading -->
+      <div style="margin-top: 20px;">
+        <div class="eyebrow">DUKUNG PRODUK LOKAL</div>
+        <h1 class="section-title">Katalog UMKM</h1>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="filter-pills">
+        <button class="filter-pill active" data-filter-btn="semua">Semua</button>
+        <button class="filter-pill" data-filter-btn="makanan">Makanan</button>
+        <button class="filter-pill" data-filter-btn="kerajinan">Kerajinan</button>
+        <button class="filter-pill" data-filter-btn="tani">Hasil tani</button>
+      </div>
+
+      <!-- Product Grid (Dilengkapi Nama Usaha UMKM Pemilik & Harga/Keterangan) -->
+      <div class="umkm-grid">
+        <!-- Produk 1: Tahu Karangkemiri -->
+        <div class="umkm-card" data-category="makanan">
+          <div class="umkm-thumb">
+            <span class="gold-dot sm"></span>
+            <span>Tahu Karangkemiri</span>
+          </div>
+          <span class="umkm-owner-badge">UMKM Sari Kedelai</span>
+          <h2 class="umkm-title">Tahu Karangkemiri</h2>
+          <p class="umkm-cat">Makanan olahan</p>
+          <div class="umkm-price-row">Tanyakan harga</div>
+          <a href="https://wa.me/6281234567890?text=Halo%20*UMKM%20Sari%20Kedelai*%2C%20saya%20melihat%20Katalog%20Website%20Desa%20Wisata%20Karangkemiri%20dan%20ingin%20menanyakan%2Fmemesan%20produk%20*Tahu%20Karangkemiri*." target="_blank" rel="noopener" class="btn-product-wa">
+            <span>Hubungi penjual</span>
+          </a>
+        </div>
+
+        <!-- Produk 2: Gula Jawa -->
+        <div class="umkm-card" data-category="makanan">
+          <div class="umkm-thumb">
+            <span class="gold-dot sm"></span>
+            <span>Gula Jawa</span>
+          </div>
+          <span class="umkm-owner-badge">UMKM Nira Lestari</span>
+          <h2 class="umkm-title">Gula Jawa</h2>
+          <p class="umkm-cat">Produk lokal</p>
+          <div class="umkm-price-row">Tanyakan harga</div>
+          <a href="https://wa.me/6281234567890?text=Halo%20*UMKM%20Nira%20Lestari*%2C%20saya%20melihat%20Katalog%20Website%20Desa%20Wisata%20Karangkemiri%20dan%20ingin%20menanyakan%2Fmemesan%20produk%20*Gula%20Jawa*." target="_blank" rel="noopener" class="btn-product-wa">
+            <span>Hubungi penjual</span>
+          </a>
+        </div>
+
+        <!-- Produk 3: Kain Perca -->
+        <div class="umkm-card" data-category="kerajinan">
+          <div class="umkm-thumb">
+            <span class="gold-dot sm"></span>
+            <span>Kain Perca</span>
+          </div>
+          <span class="umkm-owner-badge">UMKM Griya Kriya Perca</span>
+          <h2 class="umkm-title">Kain Perca</h2>
+          <p class="umkm-cat">Kerajinan tangan</p>
+          <div class="umkm-price-row">Tanyakan harga</div>
+          <a href="https://wa.me/6281234567890?text=Halo%20*UMKM%20Griya%20Kriya%20Perca*%2C%20saya%20melihat%20Katalog%20Website%20Desa%20Wisata%20Karangkemiri%20dan%20ingin%20menanyakan%2Fmemesan%20produk%20*Kain%20Perca*." target="_blank" rel="noopener" class="btn-product-wa">
+            <span>Hubungi penjual</span>
+          </a>
+        </div>
+
+        <!-- Produk 4: Madu Klanceng -->
+        <div class="umkm-card" data-category="tani">
+          <div class="umkm-thumb">
+            <span class="gold-dot sm"></span>
+            <span>Madu Klanceng</span>
+          </div>
+          <span class="umkm-owner-badge">Kelompok Lebah Klanceng</span>
+          <h2 class="umkm-title">Madu Klanceng</h2>
+          <p class="umkm-cat">Hasil pertanian</p>
+          <div class="umkm-price-row">Tanyakan harga</div>
+          <a href="https://wa.me/6281234567890?text=Halo%20*Kelompok%20Lebah%20Klanceng*%2C%20saya%20melihat%20Katalog%20Website%20Desa%20Wisata%20Karangkemiri%20dan%20ingin%20menanyakan%2Fmemesan%20produk%20*Madu%20Klanceng*." target="_blank" rel="noopener" class="btn-product-wa">
+            <span>Hubungi penjual</span>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Slide-out Hamburger Menu Drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="nav-drawer" id="navDrawer">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <div class="brand-mark">
+          <span class="brand-pill-left"></span>
+          <span class="brand-pill-right"></span>
+        </div>
+        <div class="brand-text">Desa Wisata<br>Karangkemiri</div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Tutup Menu">&times;</button>
+    </div>
+
+    <ul class="drawer-links">
+      <li><a href="index.html"><span>Beranda</span></a></li>
+      <li><a href="profil.html"><span>Profil Desa Wisata</span></a></li>
+      <li><a href="destinasi.html"><span>Destinasi Wisata</span></a></li>
+      <li><a href="detail-destinasi.html?slug=candi"><span>Detail Destinasi</span></a></li>
+      <li><a href="paket-wisata.html"><span>Paket Wisata</span></a></li>
+      <li><a href="katalog-umkm.html" class="active"><span>Katalog UMKM</span></a></li>
+      <li><a href="kontak.html"><span>Kontak &amp; Lokasi</span></a></li>
+      <li><a href="admin-login.html"><span>Login Admin CMS</span></a></li>
+    </ul>
+  </aside>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

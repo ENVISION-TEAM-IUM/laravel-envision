@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin - Desa Wisata Karangkemiri</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- Top Navbar Web -->
+    <header class="top-navbar">
+      <div class="navbar-inner">
+        <a href="admin-dashboard.html" class="brand-logo">
+          <div class="brand-mark">
+            <span class="brand-pill-left"></span>
+            <span class="brand-pill-right"></span>
+          </div>
+          <div class="brand-text">
+            Desa Wisata<br>Karangkemiri
+          </div>
+        </a>
+
+        <!-- Navigasi Cepat Panel Admin -->
+        <nav class="web-nav-pill" aria-label="Navigasi Admin">
+          <a href="admin-dashboard.html" class="active">Dashboard</a>
+          <a href="admin-destinasi.html">Destinasi</a>
+          <a href="admin-paket.html">Paket</a>
+          <a href="admin-umkm.html">UMKM</a>
+          <a href="admin-pratinjau.html">Pratinjau</a>
+        </nav>
+
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span class="admin-role-label">PENGELOLA KONTEN</span>
+          <button class="menu-btn" id="menuBtn" aria-label="Buka Menu Admin">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content: 02 • Dashboard -->
+    <main class="page-container">
+      <!-- Bar Hijau Admin -->
+      <div class="admin-green-bar">
+        <div class="admin-green-links">
+          <a href="admin-dashboard.html" class="active">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <span>Dashboard</span>
+          </a>
+          <a href="admin-beranda.html">Konten Website</a>
+          <a href="admin-kontak.html">Pengaturan</a>
+        </div>
+        <div class="admin-green-links">
+          <a href="index.html" target="_blank">Lihat Website Publik</a>
+          <a href="admin-login.html">Keluar</a>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="admin-dashboard.html">Admin</a> &nbsp;/&nbsp; <span>Dashboard</span>
+      </div>
+
+      <!-- Greeting -->
+      <h1 class="section-title" style="font-size: 32px;">Halo, Admin!</h1>
+      <p class="section-desc">Kelola isi website tanpa perlu mengubah kode.</p>
+
+      <!-- 4 Stat Cards (4 Kolom di Web) -->
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-num">10</div>
+          <div class="admin-stat-label">Halaman website</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num">4</div>
+          <div class="admin-stat-label">Destinasi wisata</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num">2</div>
+          <div class="admin-stat-label">Paket wisata</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-num">4</div>
+          <div class="admin-stat-label">Produk UMKM</div>
+        </div>
+      </div>
+
+      <!-- Menu Aksi: Mau mengubah apa hari ini? -->
+      <section>
+        <h2 class="section-title" style="font-size: 22px; margin-bottom: 14px;">Mau mengubah apa hari ini?</h2>
+
+        <div class="admin-action-grid">
+          <!-- 1. Edit Beranda -->
+          <a href="admin-beranda.html" class="admin-action-card">
+            <div class="admin-action-left">
+              <div class="admin-action-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="admin-action-title">Edit Beranda</div>
+                <div class="admin-action-sub">Judul, banner, dan destinasi unggulan</div>
+              </div>
+            </div>
+            <span class="admin-chevron">&#10095;</span>
+          </a>
+
+          <!-- 2. Kelola Destinasi -->
+          <a href="admin-destinasi.html" class="admin-action-card">
+            <div class="admin-action-left">
+              <div class="admin-action-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <circle cx="12" cy="12" r="5"></circle>
+                </svg>
+              </div>
+              <div>
+                <div class="admin-action-title">Kelola Destinasi</div>
+                <div class="admin-action-sub">Nama tempat, foto, dan informasi</div>
+              </div>
+            </div>
+            <span class="admin-chevron">&#10095;</span>
+          </a>
+
+          <!-- 3. Kelola Paket Wisata -->
+          <a href="admin-paket.html" class="admin-action-card">
+            <div class="admin-action-left">
+              <div class="admin-action-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                  <rect x="9" y="9" width="6" height="6"></rect>
+                </svg>
+              </div>
+              <div>
+                <div class="admin-action-title">Kelola Paket Wisata</div>
+                <div class="admin-action-sub">Harga dan kegiatan dalam paket</div>
+              </div>
+            </div>
+            <span class="admin-chevron">&#10095;</span>
+          </a>
+
+          <!-- 4. Kelola Produk UMKM -->
+          <a href="admin-umkm.html" class="admin-action-card">
+            <div class="admin-action-left">
+              <div class="admin-action-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 22 12 12 22 2 12 12 2"></polygon>
+                </svg>
+              </div>
+              <div>
+                <div class="admin-action-title">Kelola Produk UMKM</div>
+                <div class="admin-action-sub">Produk dan informasi penjual</div>
+              </div>
+            </div>
+            <span class="admin-chevron">&#10095;</span>
+          </a>
+
+          <!-- 5. Profil & Kontak -->
+          <a href="admin-profil.html" class="admin-action-card">
+            <div class="admin-action-left">
+              <div class="admin-action-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="7"></circle>
+                  <line x1="12" y1="2" x2="12" y2="5"></line>
+                  <line x1="12" y1="19" x2="12" y2="22"></line>
+                  <line x1="2" y1="12" x2="5" y2="12"></line>
+                  <line x1="19" y1="12" x2="22" y2="12"></line>
+                </svg>
+              </div>
+              <div>
+                <div class="admin-action-title">Profil &amp; Kontak</div>
+                <div class="admin-action-sub">Informasi desa dan lokasi</div>
+              </div>
+            </div>
+            <span class="admin-chevron">&#10095;</span>
+          </a>
+
+          <!-- 6. Pratinjau & Publikasi -->
+          <a href="admin-pratinjau.html" class="admin-action-card">
+            <div class="admin-action-left">
+              <div class="admin-action-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div>
+                <div class="admin-action-title">Pratinjau &amp; Publikasi</div>
+                <div class="admin-action-sub">Periksa perubahan sebelum diterbitkan</div>
+              </div>
+            </div>
+            <span class="admin-chevron">&#10095;</span>
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Slide-out Hamburger Menu Drawer Admin -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="nav-drawer" id="navDrawer">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <div class="brand-mark">
+          <span class="brand-pill-left"></span>
+          <span class="brand-pill-right"></span>
+        </div>
+        <div class="brand-text">CMS Admin<br>Karangkemiri</div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Tutup Menu">&times;</button>
+    </div>
+
+    <ul class="drawer-links">
+      <li><a href="admin-dashboard.html" class="active"><span>Dashboard</span></a></li>
+      <li><a href="admin-beranda.html"><span>Edit Beranda Website</span></a></li>
+      <li><a href="admin-profil.html"><span>Edit Profil Desa</span></a></li>
+      <li><a href="admin-destinasi.html"><span>Kelola Destinasi</span></a></li>
+      <li><a href="admin-edit-destinasi.html"><span>Edit Detail Destinasi</span></a></li>
+      <li><a href="admin-paket.html"><span>Kelola Paket Wisata</span></a></li>
+      <li><a href="admin-umkm.html"><span>Kelola Katalog UMKM</span></a></li>
+      <li><a href="admin-kontak.html"><span>Edit Kontak &amp; Lokasi</span></a></li>
+      <li><a href="admin-pratinjau.html"><span>Pratinjau &amp; Publikasi</span></a></li>
+      <li><a href="index.html"><span>Lihat Website Publik</span></a></li>
+      <li><a href="admin-login.html"><span>Keluar</span></a></li>
+    </ul>
+  </aside>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
+

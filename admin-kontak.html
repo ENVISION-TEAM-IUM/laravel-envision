@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Kontak &amp; Lokasi - Admin CMS Karangkemiri</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- Top Navbar Web -->
+    <header class="top-navbar">
+      <div class="navbar-inner">
+        <a href="admin-dashboard.html" class="brand-logo">
+          <div class="brand-mark">
+            <span class="brand-pill-left"></span>
+            <span class="brand-pill-right"></span>
+          </div>
+          <div class="brand-text">
+            Desa Wisata<br>Karangkemiri
+          </div>
+        </a>
+
+        <nav class="web-nav-pill" aria-label="Navigasi Admin">
+          <a href="admin-dashboard.html">Dashboard</a>
+          <a href="admin-destinasi.html">Destinasi</a>
+          <a href="admin-paket.html">Paket</a>
+          <a href="admin-umkm.html">UMKM</a>
+          <a href="admin-pratinjau.html">Pratinjau</a>
+        </nav>
+
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span class="admin-role-label">PENGELOLA KONTEN</span>
+          <button class="menu-btn" id="menuBtn" aria-label="Buka Menu Admin">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content: 09 • Kontak & Lokasi -->
+    <main class="page-container">
+      <!-- Bar Hijau Admin -->
+      <div class="admin-green-bar">
+        <div class="admin-green-links">
+          <a href="admin-dashboard.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <span>Dashboard</span>
+          </a>
+          <a href="admin-destinasi.html">Konten Website</a>
+          <a href="admin-kontak.html" class="active">Pengaturan</a>
+        </div>
+        <div class="admin-green-links">
+          <a href="kontak.html" target="_blank">Lihat Halaman Kontak</a>
+          <a href="admin-login.html">Keluar</a>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="admin-dashboard.html">Admin</a> &nbsp;/&nbsp; <span>Kontak &amp; Lokasi</span>
+      </div>
+
+      <h1 class="section-title" style="font-size: 32px;">Edit Kontak &amp; Lokasi</h1>
+      <p class="section-desc">Pastikan pengunjung mudah menghubungi pengelola dan menemukan desa.</p>
+
+      <form data-admin-save-form data-save-msg="Informasi Kontak & Lokasi Desa Wisata Karangkemiri berhasil disimpan!">
+        <div class="admin-two-col">
+          <!-- Kolom Kiri: Form Kontak -->
+          <div class="admin-panel-card" style="margin-bottom: 0;">
+            <h2 class="admin-panel-title">Informasi Kontak Resmi BUMDes</h2>
+
+            <div class="admin-form-group">
+              <label for="contactAddr">Alamat lengkap</label>
+              <input type="text" id="contactAddr" class="admin-input" value="Desa Karangkemiri, Kec. Karanglewas, Kab. Banyumas" required>
+            </div>
+
+            <div class="admin-form-grid">
+              <div class="admin-form-group">
+                <label for="contactWa">Nomor WhatsApp</label>
+                <input type="text" id="contactWa" class="admin-input" placeholder="08xxxxxxxxxx" value="0812-3456-7890" required>
+              </div>
+              <div class="admin-form-group">
+                <label for="contactEmail">Email pengelola</label>
+                <input type="email" id="contactEmail" class="admin-input" placeholder="contoh@email.com" value="bumdes@karangkemiri.desa.id" required>
+              </div>
+            </div>
+
+            <div class="admin-form-group">
+              <label for="contactHours">Jam operasional</label>
+              <input type="text" id="contactHours" class="admin-input" placeholder="Senin–Ahad, 09.00–17.00" value="Senin–Ahad, 08.00–17.00 WIB" required>
+            </div>
+
+            <div class="admin-form-group" style="margin-bottom: 0;">
+              <label for="contactMapUrl">Tautan Google Maps</label>
+              <input type="url" id="contactMapUrl" class="admin-input" placeholder="Tempel tautan Google Maps di sini" value="https://maps.google.com/?q=Desa+Karangkemiri+Karanglewas+Banyumas" required>
+            </div>
+          </div>
+
+          <!-- Kolom Kanan: Pratinjau Lokasi -->
+          <div class="admin-panel-card" style="margin-bottom: 0;">
+            <h2 class="admin-panel-title">Pratinjau lokasi</h2>
+            <p class="admin-panel-sub">Pastikan tautan peta mengarah ke lokasi yang benar.</p>
+
+            <div class="map-embed-wrapper" style="margin-top: 8px; height: 245px;">
+              <iframe
+                class="map-embed-iframe"
+                style="height: 245px;"
+                title="Pratinjau Peta Lokasi Desa Karangkemiri"
+                src="https://maps.google.com/maps?q=Desa+Karangkemiri,+Karanglewas,+Banyumas&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-btn-row">
+          <a href="admin-dashboard.html" class="btn-admin-secondary">Batal</a>
+          <button type="submit" class="btn-admin-primary">Simpan Kontak</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <!-- Slide-out Hamburger Menu Drawer Admin -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="nav-drawer" id="navDrawer">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <div class="brand-mark">
+          <span class="brand-pill-left"></span>
+          <span class="brand-pill-right"></span>
+        </div>
+        <div class="brand-text">CMS Admin<br>Karangkemiri</div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Tutup Menu">&times;</button>
+    </div>
+
+    <ul class="drawer-links">
+      <li><a href="admin-dashboard.html"><span>Dashboard</span></a></li>
+      <li><a href="admin-beranda.html"><span>Edit Beranda Website</span></a></li>
+      <li><a href="admin-profil.html"><span>Edit Profil Desa</span></a></li>
+      <li><a href="admin-destinasi.html"><span>Kelola Destinasi</span></a></li>
+      <li><a href="admin-edit-destinasi.html"><span>Edit Detail Destinasi</span></a></li>
+      <li><a href="admin-paket.html"><span>Kelola Paket Wisata</span></a></li>
+      <li><a href="admin-umkm.html"><span>Kelola Katalog UMKM</span></a></li>
+      <li><a href="admin-kontak.html" class="active"><span>Edit Kontak &amp; Lokasi</span></a></li>
+      <li><a href="admin-pratinjau.html"><span>Pratinjau &amp; Publikasi</span></a></li>
+      <li><a href="index.html"><span>Lihat Website Publik</span></a></li>
+      <li><a href="admin-login.html"><span>Keluar</span></a></li>
+    </ul>
+  </aside>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
+

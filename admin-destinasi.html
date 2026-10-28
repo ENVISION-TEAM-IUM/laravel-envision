@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Destinasi Wisata - Admin CMS Karangkemiri</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- Top Navbar Web -->
+    <header class="top-navbar">
+      <div class="navbar-inner">
+        <a href="admin-dashboard.html" class="brand-logo">
+          <div class="brand-mark">
+            <span class="brand-pill-left"></span>
+            <span class="brand-pill-right"></span>
+          </div>
+          <div class="brand-text">
+            Desa Wisata<br>Karangkemiri
+          </div>
+        </a>
+
+        <nav class="web-nav-pill" aria-label="Navigasi Admin">
+          <a href="admin-dashboard.html">Dashboard</a>
+          <a href="admin-destinasi.html" class="active">Destinasi</a>
+          <a href="admin-paket.html">Paket</a>
+          <a href="admin-umkm.html">UMKM</a>
+          <a href="admin-pratinjau.html">Pratinjau</a>
+        </nav>
+
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span class="admin-role-label">PENGELOLA KONTEN</span>
+          <button class="menu-btn" id="menuBtn" aria-label="Buka Menu Admin">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content: 05 • Kelola Destinasi -->
+    <main class="page-container">
+      <!-- Bar Hijau Admin -->
+      <div class="admin-green-bar">
+        <div class="admin-green-links">
+          <a href="admin-dashboard.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <span>Dashboard</span>
+          </a>
+          <a href="admin-destinasi.html" class="active">Konten Website</a>
+          <a href="admin-kontak.html">Pengaturan</a>
+        </div>
+        <div class="admin-green-links">
+          <a href="destinasi.html" target="_blank">Lihat Halaman Destinasi</a>
+          <a href="admin-login.html">Keluar</a>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="admin-dashboard.html">Admin</a> &nbsp;/&nbsp; <span>Kelola Destinasi</span>
+      </div>
+
+      <h1 class="section-title" style="font-size: 32px;">Kelola Destinasi Wisata</h1>
+      <p class="section-desc" style="margin-bottom: 20px;">Semua tempat wisata yang dapat dilihat pengunjung.</p>
+
+      <!-- Bar Pencarian & Tombol Tambah Destinasi (Web Layout) -->
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px;">
+        <div style="flex: 1; min-width: 260px;">
+          <label for="adminSearchDest" style="display: block; font-size: 13.5px; font-weight: 700; margin-bottom: 6px;">Cari destinasi</label>
+          <input type="text" id="adminSearchDest" class="admin-input" placeholder="Ketik nama tempat wisata">
+        </div>
+        <a href="admin-edit-destinasi.html?slug=new" class="btn-admin-primary" style="padding: 13.5px 24px;">
+          + Tambah Destinasi
+        </a>
+      </div>
+
+      <!-- Daftar 4 Destinasi (Grid 2 Kolom di Web) -->
+      <div class="admin-items-grid">
+        <!-- 1. Candi -->
+        <div class="admin-item-card" data-admin-dest-item>
+          <div class="admin-item-left">
+            <div class="admin-item-thumb"><span class="gold-dot sm"></span></div>
+            <div>
+              <div class="admin-item-title">Wahana Edukasi &amp; Outbound Candi</div>
+              <div class="admin-item-sub">Edukasi • Outbound</div>
+            </div>
+          </div>
+          <div class="admin-item-right">
+            <span class="badge-tayang" data-item-badge>Tayang</span>
+            <div class="admin-card-actions">
+              <a href="admin-edit-destinasi.html?slug=candi" class="admin-edit-link">Edit &#10095;</a>
+              <button type="button" class="admin-delete-link" data-delete-item="Wahana Edukasi & Outbound Candi">Hapus</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Embung -->
+        <div class="admin-item-card" data-admin-dest-item>
+          <div class="admin-item-left">
+            <div class="admin-item-thumb"><span class="gold-dot sm"></span></div>
+            <div>
+              <div class="admin-item-title">Embung Prabawulan</div>
+              <div class="admin-item-sub">Wisata alam</div>
+            </div>
+          </div>
+          <div class="admin-item-right">
+            <span class="badge-tayang" data-item-badge>Tayang</span>
+            <div class="admin-card-actions">
+              <a href="admin-edit-destinasi.html?slug=embung" class="admin-edit-link">Edit &#10095;</a>
+              <button type="button" class="admin-delete-link" data-delete-item="Embung Prabawulan">Hapus</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Agro Kelengkeng -->
+        <div class="admin-item-card" data-admin-dest-item>
+          <div class="admin-item-left">
+            <div class="admin-item-thumb"><span class="gold-dot sm"></span></div>
+            <div>
+              <div class="admin-item-title">Agro Kelengkeng Thabet</div>
+              <div class="admin-item-sub">Agrowisata</div>
+            </div>
+          </div>
+          <div class="admin-item-right">
+            <span class="badge-tayang" data-item-badge>Tayang</span>
+            <div class="admin-card-actions">
+              <a href="admin-edit-destinasi.html?slug=kelengkeng" class="admin-edit-link">Edit &#10095;</a>
+              <button type="button" class="admin-delete-link" data-delete-item="Agro Kelengkeng Thabet">Hapus</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Petilasan -->
+        <div class="admin-item-card" data-admin-dest-item>
+          <div class="admin-item-left">
+            <div class="admin-item-thumb"><span class="gold-dot sm"></span></div>
+            <div>
+              <div class="admin-item-title">Petilasan Mbah Siti Benter</div>
+              <div class="admin-item-sub">Wisata budaya</div>
+            </div>
+          </div>
+          <div class="admin-item-right">
+            <span class="badge-tayang" data-item-badge>Tayang</span>
+            <div class="admin-card-actions">
+              <a href="admin-edit-destinasi.html?slug=petilasan" class="admin-edit-link">Edit &#10095;</a>
+              <button type="button" class="admin-delete-link" data-delete-item="Petilasan Mbah Siti Benter">Hapus</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Box: Mudah kok! -->
+      <div class="admin-panel-card" style="margin-top: 24px; margin-bottom: 0;">
+        <div style="font-size: 16px; font-weight: 800; color: var(--green-dark); margin-bottom: 6px;">Mudah kok!</div>
+        <p style="font-size: 14px; color: var(--text-muted);">
+          Tekan Edit untuk memperbarui informasi. Tekan Tambah Destinasi untuk menambah tempat baru.
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Slide-out Hamburger Menu Drawer Admin -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="nav-drawer" id="navDrawer">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <div class="brand-mark">
+          <span class="brand-pill-left"></span>
+          <span class="brand-pill-right"></span>
+        </div>
+        <div class="brand-text">CMS Admin<br>Karangkemiri</div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Tutup Menu">&times;</button>
+    </div>
+
+    <ul class="drawer-links">
+      <li><a href="admin-dashboard.html"><span>Dashboard</span></a></li>
+      <li><a href="admin-beranda.html"><span>Edit Beranda Website</span></a></li>
+      <li><a href="admin-profil.html"><span>Edit Profil Desa</span></a></li>
+      <li><a href="admin-destinasi.html" class="active"><span>Kelola Destinasi</span></a></li>
+      <li><a href="admin-edit-destinasi.html"><span>Edit Detail Destinasi</span></a></li>
+      <li><a href="admin-paket.html"><span>Kelola Paket Wisata</span></a></li>
+      <li><a href="admin-umkm.html"><span>Kelola Katalog UMKM</span></a></li>
+      <li><a href="admin-kontak.html"><span>Edit Kontak &amp; Lokasi</span></a></li>
+      <li><a href="admin-pratinjau.html"><span>Pratinjau &amp; Publikasi</span></a></li>
+      <li><a href="index.html"><span>Lihat Website Publik</span></a></li>
+      <li><a href="admin-login.html"><span>Keluar</span></a></li>
+    </ul>
+  </aside>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
+

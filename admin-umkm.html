@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Katalog UMKM - Admin CMS Karangkemiri</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- Top Navbar Web -->
+    <header class="top-navbar">
+      <div class="navbar-inner">
+        <a href="admin-dashboard.html" class="brand-logo">
+          <div class="brand-mark">
+            <span class="brand-pill-left"></span>
+            <span class="brand-pill-right"></span>
+          </div>
+          <div class="brand-text">
+            Desa Wisata<br>Karangkemiri
+          </div>
+        </a>
+
+        <nav class="web-nav-pill" aria-label="Navigasi Admin">
+          <a href="admin-dashboard.html">Dashboard</a>
+          <a href="admin-destinasi.html">Destinasi</a>
+          <a href="admin-paket.html">Paket</a>
+          <a href="admin-umkm.html" class="active">UMKM</a>
+          <a href="admin-pratinjau.html">Pratinjau</a>
+        </nav>
+
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span class="admin-role-label">PENGELOLA KONTEN</span>
+          <button class="menu-btn" id="menuBtn" aria-label="Buka Menu Admin">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content: 08 • Katalog UMKM -->
+    <main class="page-container">
+      <!-- Bar Hijau Admin -->
+      <div class="admin-green-bar">
+        <div class="admin-green-links">
+          <a href="admin-dashboard.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <span>Dashboard</span>
+          </a>
+          <a href="admin-umkm.html" class="active">Konten Website</a>
+          <a href="admin-kontak.html">Pengaturan</a>
+        </div>
+        <div class="admin-green-links">
+          <a href="katalog-umkm.html" target="_blank">Lihat Katalog Publik</a>
+          <a href="admin-login.html">Keluar</a>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="admin-dashboard.html">Admin</a> &nbsp;/&nbsp; <span>Katalog UMKM</span>
+      </div>
+
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px;">
+        <div>
+          <h1 class="section-title" style="font-size: 32px;">Kelola Katalog UMKM</h1>
+          <p class="section-desc">Perbarui produk yang dijual oleh pelaku UMKM desa.</p>
+        </div>
+        <a href="#formUMKM" class="btn-admin-primary"
+           data-edit-umkm
+           data-umkm-name=""
+           data-umkm-owner=""
+           data-umkm-cat="Makanan olahan"
+           data-umkm-price="">
+          + Tambah Produk UMKM
+        </a>
+      </div>
+
+      <!-- 2-Column Web Layout: Daftar Produk UMKM (Kiri) & Form / Informasi Produk (Kanan) -->
+      <div class="admin-two-col">
+        <!-- Daftar 4 Produk UMKM -->
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- Produk 1 -->
+          <div class="admin-item-card" data-admin-card="Tahu Karangkemiri">
+            <div class="admin-item-left">
+              <div class="admin-item-thumb"><span class="gold-dot sm"></span></div>
+              <div>
+                <div class="admin-item-title">Tahu Karangkemiri</div>
+                <div class="admin-item-sub">Makanan olahan &bull; UMKM Sari Kedelai</div>
+              </div>
+            </div>
+            <div class="admin-item-right">
+              <span class="badge-tayang" data-item-badge>Tayang</span>
+              <div class="admin-card-actions">
+                <a href="#formUMKM" class="admin-edit-link"
+                   data-edit-umkm
+                   data-umkm-name="Tahu Karangkemiri"
+                   data-umkm-owner="UMKM Sari Kedelai Karangkemiri"
+                   data-umkm-cat="Makanan olahan"
+                   data-umkm-status="Tayang"
+                   data-umkm-price="Hubungi Penjual / Kemasan">
+                  Edit &#10095;
+                </a>
+                <button type="button" class="admin-delete-link" data-delete-item="Tahu Karangkemiri">Hapus</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Produk 2 -->
+          <div class="admin-item-card" data-admin-card="Gula Jawa">
+            <div class="admin-item-left">
+              <div class="admin-item-thumb"><span class="gold-dot sm"></span></div>
+              <div>
+                <div class="admin-item-title">Gula Jawa</div>
+                <div class="admin-item-sub">Produk lokal &bull; UMKM Nira Lestari</div>
+              </div>
+            </div>
+            <div class="admin-item-right">
+              <span class="badge-tayang" data-item-badge>Tayang</span>
+              <div class="admin-card-actions">
+                <a href="#formUMKM" class="admin-edit-link"
+                   data-edit-umkm
+                   data-umkm-name="Gula Jawa"
+                   data-umkm-owner="UMKM Nira Lestari Karangkemiri"
+                   data-umkm-cat="Produk lokal"
+                   data-umkm-status="Tayang"
+                   data-umkm-price="Hubungi Penjual / Kg">
+                  Edit &#10095;
+                </a>
+                <button type="button" class="admin-delete-link" data-delete-item="Gula Jawa">Hapus</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Produk 3 -->
+          <div class="admin-item-card" data-admin-card="Kain Perca">
+            <div class="admin-item-left">
+              <div class="admin-item-thumb"><span class="gold-dot sm"></span></div>
+              <div>
+                <div class="admin-item-title">Kain Perca</div>
+                <div class="admin-item-sub">Kerajinan tangan &bull; UMKM Griya Kriya Perca</div>
+              </div>
+            </div>
+            <div class="admin-item-right">
+              <span class="badge-tayang" data-item-badge>Tayang</span>
+              <div class="admin-card-actions">
+                <a href="#formUMKM" class="admin-edit-link"
+                   data-edit-umkm
+                   data-umkm-name="Kain Perca"
+                   data-umkm-owner="UMKM Griya Kriya Perca"
+                   data-umkm-cat="Kerajinan tangan"
+                   data-umkm-status="Tayang"
+                   data-umkm-price="Hubungi Penjual / Produk">
+                  Edit &#10095;
+                </a>
+                <button type="button" class="admin-delete-link" data-delete-item="Kain Perca">Hapus</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Produk 4 -->
+          <div class="admin-item-card" data-admin-card="Madu Klanceng">
+            <div class="admin-item-left">
+              <div class="admin-item-thumb"><span class="gold-dot sm"></span></div>
+              <div>
+                <div class="admin-item-title">Madu Klanceng</div>
+                <div class="admin-item-sub">Hasil pertanian &bull; Kelompok Lebah Klanceng</div>
+              </div>
+            </div>
+            <div class="admin-item-right">
+              <span class="badge-tayang" data-item-badge>Tayang</span>
+              <div class="admin-card-actions">
+                <a href="#formUMKM" class="admin-edit-link"
+                   data-edit-umkm
+                   data-umkm-name="Madu Klanceng"
+                   data-umkm-owner="Kelompok Tani Lebah Klanceng"
+                   data-umkm-cat="Hasil pertanian"
+                   data-umkm-status="Tayang"
+                   data-umkm-price="Hubungi Penjual / Botol">
+                  Edit &#10095;
+                </a>
+                <button type="button" class="admin-delete-link" data-delete-item="Madu Klanceng">Hapus</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kolom Kanan: Info Box & Form Edit Produk UMKM -->
+        <div>
+          <div class="admin-panel-card" style="background: var(--green-tint); border-color: rgba(20, 90, 50, 0.25); margin-bottom: 18px;">
+            <h2 class="admin-panel-title" style="color: var(--green-dark); margin-bottom: 6px;">Informasi produk</h2>
+            <p class="admin-panel-sub" style="margin-bottom: 0; color: var(--text-dark);">
+              Pilih <strong>Edit</strong> untuk mengganti nama, kategori, status tampil, harga, atau pemilik produk. Gunakan <strong>Draf / Sembunyikan</strong> jika stok sedang kosong.
+            </p>
+          </div>
+
+          <form id="formUMKM" class="admin-panel-card" style="margin-bottom: 0;" data-admin-save-form data-save-msg="Produk UMKM berhasil diperbarui!">
+            <h2 class="admin-panel-title">Edit / Tambah Produk UMKM</h2>
+
+            <div class="admin-form-group">
+              <label for="umkmFormName">Nama produk</label>
+              <input type="text" id="umkmFormName" class="admin-input" placeholder="Tahu Karangkemiri" value="Tahu Karangkemiri" required>
+            </div>
+
+            <div class="admin-form-group">
+              <label for="umkmFormOwner">Nama usaha / pemilik UMKM</label>
+              <input type="text" id="umkmFormOwner" class="admin-input" placeholder="Contoh: UMKM Sari Kedelai" value="UMKM Sari Kedelai Karangkemiri" required>
+            </div>
+
+            <div class="admin-form-grid">
+              <div class="admin-form-group">
+                <label for="umkmFormCat">Kategori produk</label>
+                <select id="umkmFormCat" class="admin-select">
+                  <option value="Makanan olahan" selected>Makanan olahan</option>
+                  <option value="Produk lokal">Produk lokal</option>
+                  <option value="Kerajinan tangan">Kerajinan tangan</option>
+                  <option value="Hasil pertanian">Hasil pertanian</option>
+                </select>
+              </div>
+              <div class="admin-form-group">
+                <label for="umkmFormStatus">Status tampil</label>
+                <select id="umkmFormStatus" class="admin-select" data-status-select>
+                  <option value="Tayang" selected>Tayang</option>
+                  <option value="Draf">Draf</option>
+                  <option value="Sembunyikan">Sembunyikan</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="admin-form-group">
+              <label for="umkmFormPrice">Harga / keterangan harga</label>
+              <input type="text" id="umkmFormPrice" class="admin-input" placeholder="Hubungi Penjual / Kemasan" value="Hubungi Penjual / Kemasan" required>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+              <button type="submit" class="btn-admin-primary" style="flex: 1;">
+                Simpan Produk UMKM
+              </button>
+              <button type="button" class="btn-admin-danger" data-delete-from-form="umkmFormName">
+                Hapus
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Slide-out Hamburger Menu Drawer Admin -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="nav-drawer" id="navDrawer">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <div class="brand-mark">
+          <span class="brand-pill-left"></span>
+          <span class="brand-pill-right"></span>
+        </div>
+        <div class="brand-text">CMS Admin<br>Karangkemiri</div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Tutup Menu">&times;</button>
+    </div>
+
+    <ul class="drawer-links">
+      <li><a href="admin-dashboard.html"><span>Dashboard</span></a></li>
+      <li><a href="admin-beranda.html"><span>Edit Beranda Website</span></a></li>
+      <li><a href="admin-profil.html"><span>Edit Profil Desa</span></a></li>
+      <li><a href="admin-destinasi.html"><span>Kelola Destinasi</span></a></li>
+      <li><a href="admin-edit-destinasi.html"><span>Edit Detail Destinasi</span></a></li>
+      <li><a href="admin-paket.html"><span>Kelola Paket Wisata</span></a></li>
+      <li><a href="admin-umkm.html" class="active"><span>Kelola Katalog UMKM</span></a></li>
+      <li><a href="admin-kontak.html"><span>Edit Kontak &amp; Lokasi</span></a></li>
+      <li><a href="admin-pratinjau.html"><span>Pratinjau &amp; Publikasi</span></a></li>
+      <li><a href="index.html"><span>Lihat Website Publik</span></a></li>
+      <li><a href="admin-login.html"><span>Keluar</span></a></li>
+    </ul>
+  </aside>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
+

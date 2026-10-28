@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Paket Wisata - Admin CMS Karangkemiri</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- Top Navbar Web -->
+    <header class="top-navbar">
+      <div class="navbar-inner">
+        <a href="admin-dashboard.html" class="brand-logo">
+          <div class="brand-mark">
+            <span class="brand-pill-left"></span>
+            <span class="brand-pill-right"></span>
+          </div>
+          <div class="brand-text">
+            Desa Wisata<br>Karangkemiri
+          </div>
+        </a>
+
+        <nav class="web-nav-pill" aria-label="Navigasi Admin">
+          <a href="admin-dashboard.html">Dashboard</a>
+          <a href="admin-destinasi.html">Destinasi</a>
+          <a href="admin-paket.html" class="active">Paket</a>
+          <a href="admin-umkm.html">UMKM</a>
+          <a href="admin-pratinjau.html">Pratinjau</a>
+        </nav>
+
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span class="admin-role-label">PENGELOLA KONTEN</span>
+          <button class="menu-btn" id="menuBtn" aria-label="Buka Menu Admin">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content: 07 • Paket Wisata -->
+    <main class="page-container">
+      <!-- Bar Hijau Admin -->
+      <div class="admin-green-bar">
+        <div class="admin-green-links">
+          <a href="admin-dashboard.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <span>Dashboard</span>
+          </a>
+          <a href="admin-paket.html" class="active">Konten Website</a>
+          <a href="admin-kontak.html">Pengaturan</a>
+        </div>
+        <div class="admin-green-links">
+          <a href="paket-wisata.html" target="_blank">Lihat Halaman Paket</a>
+          <a href="admin-login.html">Keluar</a>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="admin-dashboard.html">Admin</a> &nbsp;/&nbsp; <span>Paket Wisata</span>
+      </div>
+
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px;">
+        <div>
+          <h1 class="section-title" style="font-size: 32px;">Kelola Paket Wisata</h1>
+          <p class="section-desc">Atur paket kunjungan, kegiatan, dan harga yang terlihat pengunjung.</p>
+        </div>
+        <a href="#formPaket" class="btn-admin-primary" data-edit-pkg data-pkg-name="" data-pkg-price="" data-pkg-desc="">
+          + Tambah Paket
+        </a>
+      </div>
+
+      <!-- 2-Column Web Layout: Daftar Paket (Kiri) & Formulir Paket (Kanan) -->
+      <div class="admin-two-col">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Paket 1 -->
+          <div class="admin-item-card" data-admin-card="Paket Outbound">
+            <div class="admin-item-left">
+              <div class="admin-item-thumb"><span class="gold-dot sm"></span></div>
+              <div>
+                <div class="admin-item-title">Paket Outbound</div>
+                <div class="admin-item-sub">Aktivitas luar ruang</div>
+              </div>
+            </div>
+            <div class="admin-item-right">
+              <span class="badge-tayang" data-item-badge>Tayang</span>
+              <div class="admin-card-actions">
+                <a href="#formPaket" class="admin-edit-link"
+                   data-edit-pkg
+                   data-pkg-name="Paket Outbound"
+                   data-pkg-price="Konfirmasi Harga / Peserta"
+                   data-pkg-status="Tayang"
+                   data-pkg-desc="Durasi 3–4 jam, minimal 20 peserta, permainan kelompok, pendamping instruktur, dan penggunaan area outbound luas.">
+                  Edit &#10095;
+                </a>
+                <button type="button" class="admin-delete-link" data-delete-item="Paket Outbound">Hapus</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paket 2 -->
+          <div class="admin-item-card" data-admin-card="Paket Edukasi">
+            <div class="admin-item-left">
+              <div class="admin-item-thumb"><span class="gold-dot sm"></span></div>
+              <div>
+                <div class="admin-item-title">Paket Edukasi</div>
+                <div class="admin-item-sub">Kegiatan belajar dan praktik</div>
+              </div>
+            </div>
+            <div class="admin-item-right">
+              <span class="badge-tayang" data-item-badge>Tayang</span>
+              <div class="admin-card-actions">
+                <a href="#formPaket" class="admin-edit-link"
+                   data-edit-pkg
+                   data-pkg-name="Paket Edukasi"
+                   data-pkg-price="Konfirmasi Harga / Peserta"
+                   data-pkg-status="Tayang"
+                   data-pkg-desc="Durasi 2–3 jam, minimal 20 peserta, praktik pembuatan tahu/gula jawa/kerajinan bersama pelaku UMKM lokal.">
+                  Edit &#10095;
+                </a>
+                <button type="button" class="admin-delete-link" data-delete-item="Paket Edukasi">Hapus</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulir Paket -->
+        <form id="formPaket" class="admin-panel-card" style="margin-bottom: 0;" data-admin-save-form data-save-msg="Data Paket Wisata berhasil disimpan!">
+          <h2 class="admin-panel-title">Formulir paket wisata</h2>
+
+          <div class="admin-form-group">
+            <label for="pkgFormName">Nama paket</label>
+            <input type="text" id="pkgFormName" class="admin-input" placeholder="Paket Outbound" value="Paket Outbound" required>
+          </div>
+
+          <div class="admin-form-grid">
+            <div class="admin-form-group">
+              <label for="pkgFormPrice">Harga / keterangan</label>
+              <input type="text" id="pkgFormPrice" class="admin-input" placeholder="Rp100.000 / orang atau Hubungi pengelola" value="Konfirmasi Harga / Peserta" required>
+            </div>
+
+            <div class="admin-form-group">
+              <label for="pkgFormStatus">Status tampil</label>
+              <select id="pkgFormStatus" class="admin-select" data-status-select>
+                <option value="Tayang" selected>Tayang</option>
+                <option value="Draf">Draf</option>
+                <option value="Sembunyikan">Sembunyikan</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-form-group">
+            <label for="pkgFormDesc">Isi kegiatan, durasi &amp; ketentuan peserta</label>
+            <textarea id="pkgFormDesc" class="admin-textarea" placeholder="Tuliskan kegiatan dalam paket." required>Durasi 3–4 jam, minimal 20 peserta, permainan kelompok, pendamping instruktur, dan penggunaan area outbound luas.</textarea>
+          </div>
+
+          <div style="display: flex; gap: 12px;">
+            <button type="submit" class="btn-admin-primary" style="flex: 1;">
+              Simpan Paket
+            </button>
+            <button type="button" class="btn-admin-danger" data-delete-from-form="pkgFormName">
+              Hapus
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <!-- Slide-out Hamburger Menu Drawer Admin -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="nav-drawer" id="navDrawer">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <div class="brand-mark">
+          <span class="brand-pill-left"></span>
+          <span class="brand-pill-right"></span>
+        </div>
+        <div class="brand-text">CMS Admin<br>Karangkemiri</div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Tutup Menu">&times;</button>
+    </div>
+
+    <ul class="drawer-links">
+      <li><a href="admin-dashboard.html"><span>Dashboard</span></a></li>
+      <li><a href="admin-beranda.html"><span>Edit Beranda Website</span></a></li>
+      <li><a href="admin-profil.html"><span>Edit Profil Desa</span></a></li>
+      <li><a href="admin-destinasi.html"><span>Kelola Destinasi</span></a></li>
+      <li><a href="admin-edit-destinasi.html"><span>Edit Detail Destinasi</span></a></li>
+      <li><a href="admin-paket.html" class="active"><span>Kelola Paket Wisata</span></a></li>
+      <li><a href="admin-umkm.html"><span>Kelola Katalog UMKM</span></a></li>
+      <li><a href="admin-kontak.html"><span>Edit Kontak &amp; Lokasi</span></a></li>
+      <li><a href="admin-pratinjau.html"><span>Pratinjau &amp; Publikasi</span></a></li>
+      <li><a href="index.html"><span>Lihat Website Publik</span></a></li>
+      <li><a href="admin-login.html"><span>Keluar</span></a></li>
+    </ul>
+  </aside>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
+
