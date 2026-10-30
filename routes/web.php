@@ -19,3 +19,12 @@ Route::get('/profil.html', function () {
 Route::get('/profil', function () {
     return view('profil');
 })->name('profil.clean');
+
+// Halaman Destinasi Wisata
+Route::get('/destinasi', function () {
+    return view('destinasi.index');
+})->name('destinasi.index');
+
+Route::get('/destinasi.html', function () {
+    return view('destinasi.index');
+})->name('destinasi.html');
