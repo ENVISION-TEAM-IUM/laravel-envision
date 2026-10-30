@@ -18,6 +18,10 @@ class StoreDestinasiRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        if (\Illuminate\Support\Facades\Gate::has('manage-destinasi')) {
+            return \Illuminate\Support\Facades\Gate::allows('manage-destinasi');
+        }
+
         return auth()->check();
     }
 
