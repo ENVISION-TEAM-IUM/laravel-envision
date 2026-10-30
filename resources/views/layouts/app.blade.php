@@ -46,7 +46,7 @@
         <nav class="web-nav-pill" aria-label="Navigasi Utama">
           <a href="{{ url('/') }}" class="{{ $currentNav === 'home' ? 'active' : '' }}">Beranda</a>
           <a href="{{ url('/profil.html') }}" class="{{ $currentNav === 'profil' ? 'active' : '' }}">Profil Desa</a>
-          <a href="{{ url('/destinasi.html') }}" class="{{ $currentNav === 'destinasi' ? 'active' : '' }}">Destinasi</a>
+          <a href="{{ route('destinasi.index') }}" class="{{ $currentNav === 'destinasi' ? 'active' : '' }}">Destinasi</a>
           <a href="{{ url('/paket-wisata.html') }}" class="{{ $currentNav === 'paket' ? 'active' : '' }}">Paket</a>
           <a href="{{ url('/katalog-umkm.html') }}" class="{{ $currentNav === 'umkm' ? 'active' : '' }}">UMKM</a>
           <a href="{{ url('/kontak.html') }}" class="{{ $currentNav === 'kontak' ? 'active' : '' }}">Kontak</a>
@@ -80,7 +80,7 @@
     <ul class="drawer-links">
       <li><a href="{{ url('/') }}" class="{{ $currentNav === 'home' ? 'active' : '' }}"><span>Beranda</span></a></li>
       <li><a href="{{ url('/profil.html') }}" class="{{ $currentNav === 'profil' ? 'active' : '' }}"><span>Profil Desa Wisata</span></a></li>
-      <li><a href="{{ url('/destinasi.html') }}" class="{{ $currentNav === 'destinasi' ? 'active' : '' }}"><span>Destinasi Wisata</span></a></li>
+      <li><a href="{{ route('destinasi.index') }}" class="{{ $currentNav === 'destinasi' ? 'active' : '' }}"><span>Destinasi Wisata</span></a></li>
       <li><a href="{{ url('/detail-destinasi.html?slug=candi') }}" class="{{ $currentNav === 'detail-destinasi' ? 'active' : '' }}"><span>Detail Destinasi</span></a></li>
       <li><a href="{{ url('/paket-wisata.html') }}" class="{{ $currentNav === 'paket' ? 'active' : '' }}"><span>Paket Wisata</span></a></li>
       <li><a href="{{ url('/katalog-umkm.html') }}" class="{{ $currentNav === 'umkm' ? 'active' : '' }}"><span>Katalog UMKM</span></a></li>
