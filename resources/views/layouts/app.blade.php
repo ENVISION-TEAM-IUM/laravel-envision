@@ -85,7 +85,7 @@
       <li><a href="{{ url('/paket-wisata.html') }}" class="{{ $currentNav === 'paket' ? 'active' : '' }}"><span>Paket Wisata</span></a></li>
       <li><a href="{{ url('/katalog-umkm.html') }}" class="{{ $currentNav === 'umkm' ? 'active' : '' }}"><span>Katalog UMKM</span></a></li>
       <li><a href="{{ url('/kontak.html') }}" class="{{ $currentNav === 'kontak' ? 'active' : '' }}"><span>Kontak &amp; Lokasi</span></a></li>
-      <li><a href="{{ url('/admin-login.html') }}"><span>Login Admin CMS</span></a></li>
+      <li><a href="{{ route('admin.login') }}"><span>Login Admin CMS</span></a></li>
     </ul>
   </aside>
 
