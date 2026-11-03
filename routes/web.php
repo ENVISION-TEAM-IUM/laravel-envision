@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminLoginController;
+use App\Http\Controllers\Admin\DestinasiController;
 use Illuminate\Support\Facades\Route;
 
 // Halaman Beranda Website Desa
@@ -51,8 +52,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('dashboard', [AdminLoginController::class, 'dashboard'])->name('dashboard');
 
-        // Modul-modul CMS Admin dapat ditambahkan di dalam grup ini:
-        // Route::resource('destinasi', DestinasiController::class);
-        // Route::resource('umkm', UmkmController::class);
+        // Modul CMS Destinasi Wisata
+        Route::resource('destinasi', DestinasiController::class)
+            ->only(['index', 'show', 'store', 'update', 'destroy']);
     });
 });

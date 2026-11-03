@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -10,19 +11,11 @@ class StoreDestinasiRequest extends FormRequest
 {
     /**
      * Tentukan apakah pengguna memiliki otorisasi untuk melakukan request ini.
-     *
-     * Strategi Integrasi Autentikasi:
-     * - Akses dibatasi secara ketat hanya untuk pengguna admin yang terautentikasi (auth()->check()).
-     * - Mencegah akses publik tanpa login admin.
-     * - Selaras dengan guard/middleware autentikasi yang sedang dikembangkan Firas.
+     * Hanya akun Admin dengan ability 'manage-destinasi' yang diizinkan.
      */
     public function authorize(): bool
     {
-        if (\Illuminate\Support\Facades\Gate::has('manage-destinasi')) {
-            return \Illuminate\Support\Facades\Gate::allows('manage-destinasi');
-        }
-
-        return auth()->check();
+        return Gate::allows('manage-destinasi');
     }
 
     /**

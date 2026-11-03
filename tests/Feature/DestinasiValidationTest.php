@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Http\Requests\StoreDestinasiRequest;
 use App\Http\Requests\UpdateDestinasiRequest;
+use App\Models\Admin;
 use App\Models\Destinasi;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -231,22 +232,44 @@ class DestinasiValidationTest extends TestCase
     }
 
     /**
-     * Memastikan otorisasi Form Request menolak pengguna publik dan mengizinkan pengguna terautentikasi (admin).
+     * Memastikan Form Request menolak guest (belum login).
      */
-    public function test_authorization_protects_admin_endpoint(): void
+    public function test_form_request_authorization_rejects_guest(): void
     {
         $storeRequest = new StoreDestinasiRequest();
         $updateRequest = new UpdateDestinasiRequest();
 
-        // Belum login (publik) -> harus ditolak
-        $this->assertFalse($storeRequest->authorize(), 'Pengguna publik tanpa login harus ditolak otorisasi.');
-        $this->assertFalse($updateRequest->authorize(), 'Pengguna publik tanpa login harus ditolak otorisasi.');
+        $this->assertFalse($storeRequest->authorize(), 'Guest tanpa login harus ditolak otorisasi.');
+        $this->assertFalse($updateRequest->authorize(), 'Guest tanpa login harus ditolak otorisasi.');
+    }
 
-        // Sudah login -> diizinkan
+    /**
+     * Memastikan Form Request menolak user biasa pada guard web.
+     */
+    public function test_form_request_authorization_rejects_regular_user_on_web_guard(): void
+    {
         $user = User::factory()->create();
-        $this->actingAs($user);
+        $this->actingAs($user, 'web');
 
-        $this->assertTrue($storeRequest->authorize(), 'Admin terautentikasi harus diizinkan.');
-        $this->assertTrue($updateRequest->authorize(), 'Admin terautentikasi harus diizinkan.');
+        $storeRequest = new StoreDestinasiRequest();
+        $updateRequest = new UpdateDestinasiRequest();
+
+        $this->assertFalse($storeRequest->authorize(), 'User biasa pada guard web harus ditolak otorisasi.');
+        $this->assertFalse($updateRequest->authorize(), 'User biasa pada guard web harus ditolak otorisasi.');
+    }
+
+    /**
+     * Memastikan Form Request mengizinkan admin pada guard admin.
+     */
+    public function test_form_request_authorization_allows_admin_on_admin_guard(): void
+    {
+        $admin = Admin::factory()->create();
+        $this->actingAs($admin, 'admin');
+
+        $storeRequest = new StoreDestinasiRequest();
+        $updateRequest = new UpdateDestinasiRequest();
+
+        $this->assertTrue($storeRequest->authorize(), 'Admin pada guard admin harus diizinkan otorisasi.');
+        $this->assertTrue($updateRequest->authorize(), 'Admin pada guard admin harus diizinkan otorisasi.');
     }
 }
