@@ -1,0 +1,99 @@
+
+name: CD - IUM Staging Preflight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ium-staging-deployment
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    name: Validate Staging Deployment
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    environment:
+      name: staging
+
+    env:
+      SSH_HOST: ${{ vars.SSH_HOST }}
+      SSH_PORT: ${{ vars.SSH_PORT }}
+      SSH_USER: ${{ vars.SSH_USER }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+          test -s public/build/manifest.json
+
+      - name: Configure SSH
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$PRIVATE_KEY" > "$HOME/.ssh/ium_staging_actions"
+          printf '%s\n' "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/ium_staging_actions"
+          chmod 600 "$HOME/.ssh/known_hosts"
+          ssh-keygen -F "[$SSH_HOST]:$SSH_PORT" \
+            -f "$HOME/.ssh/known_hosts" >/dev/null
+
+      - name: Check server readiness
+        run: |
+          set -euo pipefail
+          ssh \
+            -i "$HOME/.ssh/ium_staging_actions" \
+            -p "$SSH_PORT" \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            "$SSH_USER@$SSH_HOST" \
+            "bash -se -- '$GITHUB_SHA'" <<'REMOTE'
+          set -euo pipefail
+          cd /home/desawi41/ium-staging/laravel-envision
+
+          test -f .env
+          test -f database/database.sqlite
+          test -f public/build/manifest.json
+          test -z "$(git status --porcelain --untracked-files=no)"
+          test "$(git branch --show-current)" = main
+
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$1"
+          git merge-base --is-ancestor HEAD origin/main
+
+          echo "Server readiness OK"
+          git log --oneline HEAD..origin/main
+          REMOTE
+
+      - name: Preview Vite transfer
+        run: |
+          set -euo pipefail
+          rsync -avzn --delete --itemize-changes \
+            -e "ssh -i $HOME/.ssh/ium_staging_actions -p $SSH_PORT -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o BatchMode=yes" \
+            public/build/ \
+            "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/public/build/"
+
+          echo "Dry-run completed. No website files changed."
