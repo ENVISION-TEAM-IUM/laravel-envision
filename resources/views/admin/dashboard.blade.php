@@ -1,80 +1,22 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Admin - Desa Wisata Karangkemiri</title>
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
-<body>
+@extends('layouts.admin')
 
-  <div class="app-shell">
-    <!-- Top Navbar Web -->
-    <header class="top-navbar">
-      <div class="navbar-inner">
-        <a href="{{ route('admin.dashboard') }}" class="brand-logo">
-          <div class="brand-mark">
-            <span class="brand-pill-left"></span>
-            <span class="brand-pill-right"></span>
-          </div>
-          <div class="brand-text">
-            Desa Wisata<br>Karangkemiri
-          </div>
-        </a>
+@section('title', 'Dashboard Admin - Desa Wisata Karangkemiri')
+@section('admin_nav', 'dashboard')
+@section('drawer_active', 'dashboard')
 
-        <!-- Navigasi Cepat Panel Admin -->
-        <nav class="web-nav-pill" aria-label="Navigasi Admin">
-          <a href="{{ route('admin.dashboard') }}" class="active">Dashboard</a>
-          <a href="admin-destinasi.html">Destinasi</a>
-          <a href="admin-paket.html">Paket</a>
-          <a href="admin-umkm.html">UMKM</a>
-          <a href="admin-pratinjau.html">Pratinjau</a>
-        </nav>
-
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <span class="admin-role-label">PENGELOLA KONTEN</span>
-          <button class="menu-btn" id="menuBtn" aria-label="Buka Menu Admin">
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </div>
-      </div>
-    </header>
-
+@section('content')
     <!-- Main Content: 02 • Dashboard -->
     <main class="page-container">
-      <!-- Bar Hijau Admin -->
-      <div class="admin-green-bar">
-        <div class="admin-green-links">
-          <a href="{{ route('admin.dashboard') }}" class="active">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            <span>Dashboard</span>
-          </a>
-          <a href="admin-beranda.html">Konten Website</a>
-          <a href="admin-kontak.html">Pengaturan</a>
-        </div>
-        <div class="admin-green-links">
-          <a href="{{ route('home') }}" target="_blank">Lihat Website Publik</a>
-          <form action="{{ route('admin.logout') }}" method="POST" style="display: inline; margin: 0;">
-            @csrf
-            <button type="submit" style="background: none; border: none; color: inherit; font: inherit; cursor: pointer; padding: 0; text-decoration: underline;">
-              Keluar
-            </button>
-          </form>
-        </div>
-      </div>
-
       <!-- Breadcrumb -->
       <div class="breadcrumb">
-        <a href="{{ route('admin.dashboard') }}">Admin</a> &nbsp;/&nbsp; <span>Dashboard</span>
+        <a href="{{ url('/admin-dashboard.html') }}">Admin</a> &nbsp;/&nbsp; <span>Dashboard</span>
       </div>
 
-      <!-- Greeting dengan Nama Admin Dinamis -->
-      <h1 class="section-title" style="font-size: 32px;">Halo, {{ Auth::guard('admin')->user()->name ?? 'Admin' }}!</h1>
-      <p class="section-desc">Kelola isi website tanpa perlu mengubah kode.</p>
+      <!-- Greeting -->
+      <h1 class="section-title" style="font-size: 32px;">Halo, Admin BUMDes!</h1>
+      <p class="section-desc">Pantau statistik kunjungan digital pengunjung serta kelola isi website desa wisata secara mandiri.</p>
 
-      <!-- 4 Stat Cards (4 Kolom di Web) -->
+      <!-- 4 Ringkasan Konten CMS -->
       <div class="admin-stats-grid">
         <div class="admin-stat-card">
           <div class="admin-stat-num">10</div>
@@ -85,14 +27,92 @@
           <div class="admin-stat-label">Destinasi wisata</div>
         </div>
         <div class="admin-stat-card">
-          <div class="admin-stat-num">2</div>
-          <div class="admin-stat-label">Paket wisata</div>
+          <div class="admin-stat-num" id="dashTotalPackages">2</div>
+          <div class="admin-stat-label">Paket wisata aktif</div>
         </div>
         <div class="admin-stat-card">
-          <div class="admin-stat-num">4</div>
-          <div class="admin-stat-label">Produk UMKM</div>
+          <div class="admin-stat-num" id="dashTotalUmkm">4</div>
+          <div class="admin-stat-label">Unit UMKM terdaftar</div>
         </div>
       </div>
+
+      <!-- Seksi Statistik Kunjungan Digital & Minat Pengunjung (Checklist Analitik) -->
+      <section id="adminDashboardAnalytics" style="margin: 28px 0 32px;">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <div class="eyebrow" style="color: var(--green-dark);">STATISTIK &amp; MINAT PENGUNJUNG</div>
+            <h2 class="section-title" style="font-size: 24px; margin-bottom: 4px;">Kunjungan Digital Website</h2>
+          </div>
+          <!-- QA & Testing Controls -->
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn-admin-secondary" id="btnSimulateVisit" style="padding: 6px 12px; font-size: 12.5px;">
+              + Simulasi 1 Kunjungan
+            </button>
+            <button type="button" class="btn-admin-secondary" id="btnSimulateWa" style="padding: 6px 12px; font-size: 12.5px;">
+              + Simulasi 1 Klik WA
+            </button>
+            <button type="button" class="btn-admin-secondary" id="btnResetAnalytics" style="padding: 6px 12px; font-size: 12.5px; color: #B91C1C;">
+              Reset Data
+            </button>
+          </div>
+        </div>
+
+        <!-- Disclaimer Box sesuai batasan analitik -->
+        <div class="admin-panel-card" style="background: var(--green-tint); border-color: rgba(20, 90, 50, 0.2); padding: 12px 18px; margin-bottom: 18px; border-radius: 14px;">
+          <div style="font-size: 13px; color: var(--text-dark); line-height: 1.5;">
+            <strong>Batasan Sistem Analitik:</strong> Angka ini mencatat statistik kunjungan digital dan interaksi pada website publik yang menjaga privasi pengunjung (tanpa melacak identitas pribadi). Statistik website tidak disamakan dengan jumlah wisatawan fisik atau reservasi resmi di lokasi.
+          </div>
+        </div>
+
+        <!-- 4 Digital Metrics Cards -->
+        <div class="admin-stats-grid" style="margin-bottom: 20px;">
+          <div class="admin-stat-card">
+            <div class="admin-stat-num" id="metricTotalViews">1.248</div>
+            <div class="admin-stat-label">Total Tayangan Halaman (Page Views)</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-num" id="metricUniqueVisitors">412</div>
+            <div class="admin-stat-label">Estimasi Pengunjung Unik (Privasi Aman)</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-num" id="metricTotalWa" style="color: #0E7490;">168</div>
+            <div class="admin-stat-label">Minat Klik WhatsApp (Konversi Minat)</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-num" id="metricAvgViews" style="color: #D97706;">3,0</div>
+            <div class="admin-stat-label">Rata-rata Halaman per Pengunjung</div>
+          </div>
+        </div>
+
+        <!-- 2 Kolom Rincian: Top Halaman (Kiri) & Top Minat WhatsApp (Kanan) -->
+        <div class="admin-two-col">
+          <!-- Kolom Kiri: Halaman Paling Banyak Dikunjungi -->
+          <div class="admin-panel-card" style="margin-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <h3 class="admin-panel-title" style="margin-bottom: 0; font-size: 16px;">Halaman Paling Banyak Dikunjungi</h3>
+              <span class="badge-tayang" style="font-size: 11px;">Ranking Halaman</span>
+            </div>
+            <p class="admin-panel-sub" style="font-size: 12.5px; margin-bottom: 16px;">Ringkasan minat pengunjung terhadap konten wisata dan produk desa.</p>
+
+            <div id="analyticsTopPagesList" style="display: flex; flex-direction: column; gap: 14px;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Kolom Kanan: Minat Interaksi Pengunjung (Klik WhatsApp) -->
+          <div class="admin-panel-card" style="margin-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap;">
+              <h3 class="admin-panel-title" style="margin-bottom: 0; font-size: 16px;">Minat Interaksi Pengunjung (WhatsApp)</h3>
+              <span class="badge-category" style="font-size: 11px; white-space: nowrap; flex-shrink: 0;">Tujuan Tanya Jawab</span>
+            </div>
+            <p class="admin-panel-sub" style="font-size: 12.5px; margin-bottom: 16px;">Pencatatan klik tombol WhatsApp saat pengunjung tertarik memesan atau bertanya.</p>
+
+            <div id="analyticsTopWaList" style="display: flex; flex-direction: column; gap: 14px;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- Menu Aksi: Mau mengubah apa hari ini? -->
       <section>
@@ -100,7 +120,7 @@
 
         <div class="admin-action-grid">
           <!-- 1. Edit Beranda -->
-          <a href="admin-beranda.html" class="admin-action-card">
+          <a href="{{ url('/admin-beranda.html') }}" class="admin-action-card">
             <div class="admin-action-left">
               <div class="admin-action-icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -116,7 +136,7 @@
           </a>
 
           <!-- 2. Kelola Destinasi -->
-          <a href="admin-destinasi.html" class="admin-action-card">
+          <a href="{{ url('/admin-destinasi.html') }}" class="admin-action-card">
             <div class="admin-action-left">
               <div class="admin-action-icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -133,7 +153,7 @@
           </a>
 
           <!-- 3. Kelola Paket Wisata -->
-          <a href="admin-paket.html" class="admin-action-card">
+          <a href="{{ url('/admin-paket.html') }}" class="admin-action-card">
             <div class="admin-action-left">
               <div class="admin-action-icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -149,8 +169,8 @@
             <span class="admin-chevron">&#10095;</span>
           </a>
 
-          <!-- 4. Kelola Produk UMKM -->
-          <a href="admin-umkm.html" class="admin-action-card">
+          <!-- 4. Kelola Produk & Profil UMKM -->
+          <a href="{{ url('/admin-umkm.html') }}" class="admin-action-card">
             <div class="admin-action-left">
               <div class="admin-action-icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -158,19 +178,19 @@
                 </svg>
               </div>
               <div>
-                <div class="admin-action-title">Kelola Produk UMKM</div>
-                <div class="admin-action-sub">Produk dan informasi penjual</div>
+                <div class="admin-action-title">Kelola Produk &amp; Profil UMKM</div>
+                <div class="admin-action-sub">Produk, pengrajin, dan kontak penjual</div>
               </div>
             </div>
             <span class="admin-chevron">&#10095;</span>
           </a>
 
           <!-- 5. Profil & Kontak -->
-          <a href="admin-profil.html" class="admin-action-card">
+          <a href="{{ url('/admin-profil.html') }}" class="admin-action-card">
             <div class="admin-action-left">
               <div class="admin-action-icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="7"></circle>
+                  <circle cx="12" cy="7" r="7"></circle>
                   <line x1="12" y1="2" x2="12" y2="5"></line>
                   <line x1="12" y1="19" x2="12" y2="22"></line>
                   <line x1="2" y1="12" x2="5" y2="12"></line>
@@ -186,7 +206,7 @@
           </a>
 
           <!-- 6. Pratinjau & Publikasi -->
-          <a href="admin-pratinjau.html" class="admin-action-card">
+          <a href="{{ url('/admin-pratinjau.html') }}" class="admin-action-card">
             <div class="admin-action-left">
               <div class="admin-action-icon">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -203,44 +223,4 @@
         </div>
       </section>
     </main>
-  </div>
-
-  <!-- Slide-out Hamburger Menu Drawer Admin -->
-  <div class="drawer-backdrop" id="drawerBackdrop"></div>
-  <aside class="nav-drawer" id="navDrawer">
-    <div class="drawer-header">
-      <div class="brand-logo">
-        <div class="brand-mark">
-          <span class="brand-pill-left"></span>
-          <span class="brand-pill-right"></span>
-        </div>
-        <div class="brand-text">CMS Admin<br>Karangkemiri</div>
-      </div>
-      <button class="drawer-close" id="drawerClose" aria-label="Tutup Menu">&times;</button>
-    </div>
-
-    <ul class="drawer-links">
-      <li><a href="{{ route('admin.dashboard') }}" class="active"><span>Dashboard</span></a></li>
-      <li><a href="admin-beranda.html"><span>Edit Beranda Website</span></a></li>
-      <li><a href="admin-profil.html"><span>Edit Profil Desa</span></a></li>
-      <li><a href="admin-destinasi.html"><span>Kelola Destinasi</span></a></li>
-      <li><a href="admin-edit-destinasi.html"><span>Edit Detail Destinasi</span></a></li>
-      <li><a href="admin-paket.html"><span>Kelola Paket Wisata</span></a></li>
-      <li><a href="admin-umkm.html"><span>Kelola Katalog UMKM</span></a></li>
-      <li><a href="admin-kontak.html"><span>Edit Kontak &amp; Lokasi</span></a></li>
-      <li><a href="admin-pratinjau.html"><span>Pratinjau &amp; Publikasi</span></a></li>
-      <li><a href="{{ route('home') }}"><span>Lihat Website Publik</span></a></li>
-      <li>
-        <form action="{{ route('admin.logout') }}" method="POST" style="margin: 0;">
-          @csrf
-          <button type="submit" style="background: none; border: none; color: #ef4444; font: inherit; cursor: pointer; padding: 12px 18px; width: 100%; text-align: left; font-weight: 600;">
-            Keluar
-          </button>
-        </form>
-      </li>
-    </ul>
-  </aside>
-
-  <script src="{{ asset('js/app.js') }}"></script>
-</body>
-</html>
+@endsection
