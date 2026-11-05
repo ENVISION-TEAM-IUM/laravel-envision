@@ -1,67 +1,15 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pratinjau &amp; Publikasi - Admin CMS Karangkemiri</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+@extends('layouts.admin')
 
-  <div class="app-shell">
-    <!-- Top Navbar Web -->
-    <header class="top-navbar">
-      <div class="navbar-inner">
-        <a href="admin-dashboard.html" class="brand-logo">
-          <div class="brand-mark">
-            <span class="brand-pill-left"></span>
-            <span class="brand-pill-right"></span>
-          </div>
-          <div class="brand-text">
-            Desa Wisata<br>Karangkemiri
-          </div>
-        </a>
+@section('title', 'Pratinjau & Publikasi - Admin CMS Karangkemiri')
+@section('admin_nav', 'pratinjau')
+@section('drawer_active', 'pratinjau')
 
-        <nav class="web-nav-pill" aria-label="Navigasi Admin">
-          <a href="admin-dashboard.html">Dashboard</a>
-          <a href="admin-destinasi.html">Destinasi</a>
-          <a href="admin-paket.html">Paket</a>
-          <a href="admin-umkm.html">UMKM</a>
-          <a href="admin-pratinjau.html" class="active">Pratinjau</a>
-        </nav>
-
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <span class="admin-role-label">PENGELOLA KONTEN</span>
-          <button class="menu-btn" id="menuBtn" aria-label="Buka Menu Admin">
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </div>
-      </div>
-    </header>
-
+@section('content')
     <!-- Main Content: 10 • Pratinjau & Publikasi -->
     <main class="page-container">
-      <!-- Bar Hijau Admin -->
-      <div class="admin-green-bar">
-        <div class="admin-green-links">
-          <a href="admin-dashboard.html">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            <span>Dashboard</span>
-          </a>
-          <a href="admin-destinasi.html">Konten Website</a>
-          <a href="admin-pratinjau.html" class="active">Pratinjau &amp; Publikasi</a>
-        </div>
-        <div class="admin-green-links">
-          <a href="index.html" target="_blank">Buka Website Penuh</a>
-          <a href="admin-login.html">Keluar</a>
-        </div>
-      </div>
-
       <!-- Breadcrumb -->
       <div class="breadcrumb">
-        <a href="admin-dashboard.html">Admin</a> &nbsp;/&nbsp; <span>Pratinjau &amp; Publikasi</span>
+        <a href="{{ url('/admin-dashboard.html') }}">Admin</a> &nbsp;/&nbsp; <span>Pratinjau &amp; Publikasi</span>
       </div>
 
       <h1 class="section-title" style="font-size: 32px;">Periksa sebelum diterbitkan</h1>
@@ -78,7 +26,7 @@
             <div style="font-size: 14px; color: var(--text-muted); margin-top: 2px;">Lihat pratinjau sebelum menerbitkan.</div>
           </div>
         </div>
-        <a href="index.html" target="_blank" class="btn-outline">
+        <a href="{{ url('/') }}" target="_blank" rel="noopener noreferrer" class="btn-preview-public">
           <span>Lihat Website Publik di Tab Baru</span>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -117,7 +65,7 @@
                   Wahana Edukasi &amp; Outbound Candi
                 </div>
               </div>
-              <a href="detail-destinasi.html?slug=candi" target="_blank" class="admin-edit-link">Lihat &#10095;</a>
+              <a href="{{ url('/detail-destinasi.html?slug=candi') }}" target="_blank" class="admin-edit-link">Lihat &#10095;</a>
             </div>
           </div>
         </div>
@@ -153,38 +101,5 @@
         </div>
       </div>
     </main>
-  </div>
-
-  <!-- Slide-out Hamburger Menu Drawer Admin -->
-  <div class="drawer-backdrop" id="drawerBackdrop"></div>
-  <aside class="nav-drawer" id="navDrawer">
-    <div class="drawer-header">
-      <div class="brand-logo">
-        <div class="brand-mark">
-          <span class="brand-pill-left"></span>
-          <span class="brand-pill-right"></span>
-        </div>
-        <div class="brand-text">CMS Admin<br>Karangkemiri</div>
-      </div>
-      <button class="drawer-close" id="drawerClose" aria-label="Tutup Menu">&times;</button>
-    </div>
-
-    <ul class="drawer-links">
-      <li><a href="admin-dashboard.html"><span>Dashboard</span></a></li>
-      <li><a href="admin-beranda.html"><span>Edit Beranda Website</span></a></li>
-      <li><a href="admin-profil.html"><span>Edit Profil Desa</span></a></li>
-      <li><a href="admin-destinasi.html"><span>Kelola Destinasi</span></a></li>
-      <li><a href="admin-edit-destinasi.html"><span>Edit Detail Destinasi</span></a></li>
-      <li><a href="admin-paket.html"><span>Kelola Paket Wisata</span></a></li>
-      <li><a href="admin-umkm.html"><span>Kelola Katalog UMKM</span></a></li>
-      <li><a href="admin-kontak.html"><span>Edit Kontak &amp; Lokasi</span></a></li>
-      <li><a href="admin-pratinjau.html" class="active"><span>Pratinjau &amp; Publikasi</span></a></li>
-      <li><a href="index.html"><span>Lihat Website Publik</span></a></li>
-      <li><a href="admin-login.html"><span>Keluar</span></a></li>
-    </ul>
-  </aside>
-
-  <script src="js/app.js"></script>
-</body>
-</html>
+@endsection
 

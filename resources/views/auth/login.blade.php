@@ -2,8 +2,21 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <style id="antiClickjack">body { display: none !important; }</style>
+  <script>
+    /* Proteksi Anti-Clickjacking Frontend */
+    if (self === top) {
+      var antiClickjack = document.getElementById('antiClickjack');
+      if (antiClickjack) antiClickjack.parentNode.removeChild(antiClickjack);
+    } else {
+      top.location = self.location;
+    }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Admin CMS - Desa Wisata Karangkemiri</title>
+  <link rel="shortcut icon" href="{{ asset('assets/images/logo-desa-wisata-karangkemiri.png') }}" type="image/png">
   <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
 <body>
@@ -15,8 +28,7 @@
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px;">
           <a href="{{ route('home') }}" class="brand-logo" style="color: #FFFFFF;">
             <div class="brand-mark">
-              <span class="brand-pill-left" style="background-color: #FFFFFF;"></span>
-              <span class="brand-pill-right" style="background-color: #DCECD7;"></span>
+              <img src="{{ asset('assets/images/logo-desa-wisata-karangkemiri.png') }}" alt="Logo Desa Wisata Karangkemiri" class="brand-logo-img" style="background-color: #FFFFFF; border-radius: 50%; padding: 2px;">
             </div>
             <div class="brand-text" style="color: #FFFFFF; font-size: 16px;">
               Desa Wisata<br>Karangkemiri
