@@ -90,7 +90,7 @@ Route::get('/kontak.html', function () {
 // Redirect /admin ke dashboard
 Route::get('/admin', function () {
     return redirect('/admin-dashboard.html');
-});
+})->middleware('auth:admin');
 
 // 01. Login Admin
 Route::get('/admin/login', function () {
@@ -98,7 +98,7 @@ Route::get('/admin/login', function () {
 })->name('admin.login');
 
 Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
-Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
+Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout')->middleware('auth:admin');
 
 Route::get('/admin-login', function () {
     return view('admin.login');
@@ -107,6 +107,9 @@ Route::get('/admin-login', function () {
 Route::get('/admin-login.html', function () {
     return view('admin.login');
 })->name('admin.login.html');
+
+// Semua halaman CMS hanya dapat diakses admin yang sudah login
+Route::middleware('auth:admin')->group(function () {
 
 // 02. Dashboard Admin
 Route::get('/admin/dashboard', function () {
@@ -224,3 +227,5 @@ Route::get('/admin-pratinjau', function () {
 Route::get('/admin-pratinjau.html', function () {
     return view('admin.pratinjau');
 })->name('admin.pratinjau.html');
+    
+});
