@@ -226,32 +226,42 @@ jobs:
 
           STARTED=0
 
+          
           rollback_on_error() {
             CODE=$?
             trap - EXIT
-
+          
             if [ "$CODE" -ne 0 ] && [ "$STARTED" = 1 ]; then
               echo "Deployment failed. Attempting staging rollback."
-
-              git reset --hard "$OLD_SHA" || true
-
-              if [ -e public/build ]; then
-                mv public/build "$BACKUP/failed-public-build" || true
+              ROLLBACK_OK=1
+          
+              git reset --hard "$OLD_SHA" || ROLLBACK_OK=0
+          
+              if [ -e public/build ] || [ -L public/build ]; then
+                mv public/build "$BACKUP/failed-public-build" || ROLLBACK_OK=0
               fi
-
-              if [ ! -e public/build ]; then
-                cp -a "$BACKUP/old-public-build" public/build || true
+          
+              if [ ! -e public/build ] && [ ! -L public/build ]; then
+                cp -a "$BACKUP/old-public-build" public/build || ROLLBACK_OK=0
               fi
-
-              php artisan route:clear || true
-              php artisan view:clear || true
-              php artisan config:clear || true
-
-              echo "Rollback attempted. Manual verification required."
+          
+              php artisan route:clear || ROLLBACK_OK=0
+              php artisan view:clear || ROLLBACK_OK=0
+              php artisan config:clear || ROLLBACK_OK=0
+          
+              test "$(git rev-parse HEAD)" = "$OLD_SHA" || ROLLBACK_OK=0
+              test -s public/build/manifest.json || ROLLBACK_OK=0
+          
+              if [ "$ROLLBACK_OK" -eq 1 ]; then
+                echo "Rollback files verified. HTTP testing still required."
+              else
+                echo "::error::Rollback incomplete. Manual recovery required: $BACKUP"
+              fi
             fi
-
+          
             exit "$CODE"
           }
+
 
           trap rollback_on_error EXIT
 
