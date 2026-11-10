@@ -1,0 +1,334 @@
+
+name: CD - IUM Staging LIVE
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Ketik DEPLOY untuk konfirmasi deployment staging"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ium-staging-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Laravel and Vite to Staging
+    if: github.ref == 'refs/heads/main' && inputs.confirm == 'DEPLOY'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    environment:
+      name: staging
+
+    env:
+      SSH_HOST: ${{ vars.SSH_HOST }}
+      SSH_PORT: ${{ vars.SSH_PORT }}
+      SSH_USER: ${{ vars.SSH_USER }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+
+    steps:
+      - name: Validate deployment destination
+        run: |
+          set -euo pipefail
+
+          test "$SSH_HOST" = "toscana.id.rapidplex.com"
+          test "$SSH_PORT" = "64000"
+          test "$SSH_USER" = "desawi41"
+          test "$DEPLOY_PATH" = "/home/desawi41/ium-staging/laravel-envision"
+
+          echo "Staging destination validated."
+
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Build frontend
+        run: |
+          set -euo pipefail
+
+          npm ci
+          npm run build
+
+          test -s public/build/manifest.json
+          echo "Vite build ready."
+
+      - name: Configure SSH
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          umask 077
+
+          mkdir -p "$HOME/.ssh"
+
+          printf '%s\n' "$PRIVATE_KEY" > "$HOME/.ssh/ium_staging_actions"
+          printf '%s\n' "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+
+          chmod 600 "$HOME/.ssh/ium_staging_actions"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+          ssh-keygen -F "[$SSH_HOST]:$SSH_PORT" \
+            -f "$HOME/.ssh/known_hosts" >/dev/null
+
+      - name: Verify server and create fresh backup
+        run: |
+          set -euo pipefail
+
+          ssh \
+            -i "$HOME/.ssh/ium_staging_actions" \
+            -p "$SSH_PORT" \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            "$SSH_USER@$SSH_HOST" \
+            "bash -se -- '$GITHUB_SHA' '$GITHUB_RUN_ID' '$GITHUB_RUN_ATTEMPT'" <<'REMOTE'
+          set -euo pipefail
+          umask 077
+
+          SHA="$1"
+          RUN_ID="$2"
+          ATTEMPT="$3"
+
+          APP="/home/desawi41/ium-staging/laravel-envision"
+          BACKUP="/home/desawi41/ium-backups/live-${RUN_ID}-${ATTEMPT}"
+
+          cd "$APP"
+          test "$(pwd -P)" = "$APP"
+          test ! -L "$APP"
+          test -d .git
+          test -f .env
+          test -f database/database.sqlite
+          test -f vendor/autoload.php
+          test -s public/build/manifest.json
+
+          test "$(git branch --show-current)" = main
+          test -z "$(git status --porcelain --untracked-files=no)"
+
+          GIT_TERMINAL_PROMPT=0 timeout 60 git fetch origin main
+
+          test "$(git rev-parse origin/main)" = "$SHA"
+          git merge-base --is-ancestor HEAD "$SHA"
+
+          if ! git diff --quiet HEAD "$SHA" -- \
+            database/migrations composer.json composer.lock; then
+            echo "Migration or Composer changes detected. Deployment blocked."
+            exit 1
+          fi
+
+          git show "$SHA:routes/web.php" | php -l
+
+          mkdir -m 700 "$BACKUP"
+
+          git rev-parse HEAD > "$BACKUP/previous-commit"
+          cp -p .env "$BACKUP/.env"
+
+          php -r '
+            $source = new SQLite3($argv[1], SQLITE3_OPEN_READONLY);
+            $target = new SQLite3($argv[2]);
+
+            if (!$source->backup($target)) {
+                exit(1);
+            }
+
+            if ($target->querySingle("PRAGMA integrity_check") !== "ok") {
+                exit(1);
+            }
+
+            echo "SQLite backup verified\n";
+          ' database/database.sqlite "$BACKUP/database.sqlite"
+
+          cp -a public/build "$BACKUP/old-public-build"
+
+          tar -czf "$BACKUP/source.tar.gz" \
+            --exclude='laravel-envision/.env' \
+            --exclude='laravel-envision/database/database.sqlite' \
+            --exclude='laravel-envision/public/build' \
+            --exclude='laravel-envision/storage/logs' \
+            --exclude='laravel-envision/storage/framework/sessions' \
+            --exclude='laravel-envision/storage/framework/cache' \
+            --exclude='laravel-envision/storage/framework/views' \
+            -C /home/desawi41/ium-staging laravel-envision
+
+          tar -tzf "$BACKUP/source.tar.gz" >/dev/null
+
+          test -s "$BACKUP/.env"
+          test -s "$BACKUP/database.sqlite"
+          test -s "$BACKUP/source.tar.gz"
+          test -s "$BACKUP/old-public-build/manifest.json"
+
+          echo "Backup verified: $BACKUP"
+          REMOTE
+
+      - name: Upload Vite assets to temporary directory
+        run: |
+          set -euo pipefail
+
+          INCOMING="/home/desawi41/ium-staging/.ium-vite-incoming-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+          rsync -avz --delete \
+            -e "ssh -i $HOME/.ssh/ium_staging_actions -p $SSH_PORT -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o BatchMode=yes" \
+            public/build/ \
+            "$SSH_USER@$SSH_HOST:$INCOMING/"
+
+          echo "Temporary Vite assets uploaded."
+
+      - name: Activate staging deployment
+        run: |
+          set -euo pipefail
+
+          ssh \
+            -i "$HOME/.ssh/ium_staging_actions" \
+            -p "$SSH_PORT" \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            "$SSH_USER@$SSH_HOST" \
+            "bash -se -- '$GITHUB_SHA' '$GITHUB_RUN_ID' '$GITHUB_RUN_ATTEMPT'" <<'REMOTE'
+          set -euo pipefail
+
+          SHA="$1"
+          RUN_ID="$2"
+          ATTEMPT="$3"
+
+          APP="/home/desawi41/ium-staging/laravel-envision"
+          BACKUP="/home/desawi41/ium-backups/live-${RUN_ID}-${ATTEMPT}"
+          INCOMING="/home/desawi41/ium-staging/.ium-vite-incoming-${RUN_ID}-${ATTEMPT}"
+
+          cd "$APP"
+          test "$(pwd -P)" = "$APP"
+          test ! -L "$APP"
+          test "$(git branch --show-current)" = main
+          test -z "$(git status --porcelain --untracked-files=no)"
+
+          OLD_SHA="$(cat "$BACKUP/previous-commit")"
+
+          test "$(git rev-parse HEAD)" = "$OLD_SHA"
+          test "$(git rev-parse origin/main)" = "$SHA"
+
+          test -s "$INCOMING/manifest.json"
+          test -s "$BACKUP/old-public-build/manifest.json"
+          test -s "$BACKUP/database.sqlite"
+          test -f "$BACKUP/.env"
+
+          STARTED=0
+
+          
+          rollback_on_error() {
+            CODE=$?
+            trap - EXIT
+          
+            if [ "$CODE" -ne 0 ] && [ "$STARTED" = 1 ]; then
+              echo "Deployment failed. Attempting staging rollback."
+              ROLLBACK_OK=1
+          
+              git reset --hard "$OLD_SHA" || ROLLBACK_OK=0
+          
+              if [ -e public/build ] || [ -L public/build ]; then
+                mv public/build "$BACKUP/failed-public-build" || ROLLBACK_OK=0
+              fi
+          
+              if [ ! -e public/build ] && [ ! -L public/build ]; then
+                cp -a "$BACKUP/old-public-build" public/build || ROLLBACK_OK=0
+              fi
+          
+              php artisan route:clear || ROLLBACK_OK=0
+              php artisan view:clear || ROLLBACK_OK=0
+              php artisan config:clear || ROLLBACK_OK=0
+          
+              test "$(git rev-parse HEAD)" = "$OLD_SHA" || ROLLBACK_OK=0
+              test -s public/build/manifest.json || ROLLBACK_OK=0
+          
+              if [ "$ROLLBACK_OK" -eq 1 ]; then
+                echo "Rollback files verified. HTTP testing still required."
+              else
+                echo "::error::Rollback incomplete. Manual recovery required: $BACKUP"
+              fi
+            fi
+          
+            exit "$CODE"
+          }
+
+
+          trap rollback_on_error EXIT
+
+          STARTED=1
+
+          git merge --ff-only "$SHA"
+
+          mv public/build "$BACKUP/build-before-activation"
+          mv "$INCOMING" public/build
+
+          php artisan route:clear
+          php artisan view:clear
+          php artisan config:clear
+
+          php artisan route:list --json > "$BACKUP/routes-after.json"
+
+          php -r '
+            $routes = json_decode(
+                file_get_contents($argv[1]),
+                true,
+                512,
+                JSON_THROW_ON_ERROR
+            );
+
+            $count = 0;
+
+            foreach ($routes as $route) {
+                $uri = $route["uri"] ?? "";
+
+                if (!str_starts_with($uri, "admin")) {
+                    continue;
+                }
+
+                if (in_array($uri, [
+                    "admin/login",
+                    "admin-login",
+                    "admin-login.html"
+                ], true)) {
+                    continue;
+                }
+
+                $middleware = (array) ($route["middleware"] ?? []);
+
+                if (!in_array("auth:admin", $middleware, true)) {
+                    fwrite(STDERR, "Unprotected admin route: $uri\n");
+                    exit(1);
+                }
+
+                $count++;
+            }
+
+            if ($count === 0) {
+                fwrite(STDERR, "No protected admin routes found\n");
+                exit(1);
+            }
+
+            echo "Admin route protection verified\n";
+          ' "$BACKUP/routes-after.json"
+
+          test "$(git rev-parse HEAD)" = "$SHA"
+          test -s public/build/manifest.json
+          test -f database/database.sqlite
+          test -f .env
+
+          STARTED=0
+
+          echo "STAGING DEPLOYMENT SUCCESS"
+          echo "Deployed commit: $SHA"
+          echo "Rollback backup: $BACKUP"
+          REMOTE
