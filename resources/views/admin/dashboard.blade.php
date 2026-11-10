@@ -13,8 +13,8 @@
       </div>
 
       <!-- Greeting -->
-      <h1 class="section-title" style="font-size: 32px;">Halo, Admin BUMDes!</h1>
-      <p class="section-desc">Pantau statistik kunjungan digital pengunjung serta kelola isi website desa wisata secara mandiri.</p>
+      <h1 class="section-title" style="font-size: 32px;">Halo, {{ Auth::guard('admin')->user()->name ?? 'Admin BUMDes' }}!</h1>
+      <p class="section-desc">Pantau statistik kunjungan digital pengunjung serta Kelola isi website desa wisata secara mandiri.</p>
 
       <!-- 4 Ringkasan Konten CMS -->
       <div class="admin-stats-grid">
@@ -23,15 +23,15 @@
           <div class="admin-stat-label">Halaman website</div>
         </div>
         <div class="admin-stat-card">
-          <div class="admin-stat-num">4</div>
+          <div class="admin-stat-num">{{ $totalDestinasi ?? 4 }}</div>
           <div class="admin-stat-label">Destinasi wisata</div>
         </div>
         <div class="admin-stat-card">
-          <div class="admin-stat-num" id="dashTotalPackages">2</div>
+          <div class="admin-stat-num" id="dashTotalPackages">{{ $totalPaket ?? 1 }}</div>
           <div class="admin-stat-label">Paket wisata aktif</div>
         </div>
         <div class="admin-stat-card">
-          <div class="admin-stat-num" id="dashTotalUmkm">4</div>
+          <div class="admin-stat-num" id="dashTotalUmkm">{{ $totalUmkm ?? 1 }}</div>
           <div class="admin-stat-label">Unit UMKM terdaftar</div>
         </div>
       </div>
