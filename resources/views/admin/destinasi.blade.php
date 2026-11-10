@@ -15,90 +15,52 @@
       <h1 class="section-title" style="font-size: 32px;">Kelola Destinasi Wisata</h1>
       <p class="section-desc" style="margin-bottom: 20px;">Semua tempat wisata yang dapat dilihat pengunjung.</p>
 
+      @if (session('success'))
+        <div class="admin-alert" style="display: flex; background: #e8f5e9; border: 1px solid #c8e6c9; color: #2e7d32; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 600;">
+          {{ session('success') }}
+        </div>
+      @endif
+
       <!-- Bar Pencarian & Tombol Tambah Destinasi (Web Layout) -->
-      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px;">
+      <form method="GET" action="{{ route('admin.destinasi.index') }}" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px;">
         <div style="flex: 1; min-width: 260px;">
           <label for="adminSearchDest" style="display: block; font-size: 13.5px; font-weight: 700; margin-bottom: 6px;">Cari destinasi</label>
-          <input type="text" id="adminSearchDest" class="admin-input" placeholder="Ketik nama tempat wisata">
+          <input type="text" id="adminSearchDest" name="search" class="admin-input" placeholder="Ketik nama tempat wisata..." value="{{ request('search') }}">
         </div>
-        <a href="{{ url('/admin-edit-destinasi.html?slug=new') }}" class="btn-admin-primary" style="padding: 13.5px 24px;">
+        <button type="submit" class="btn-admin-secondary" style="padding: 13.5px 20px;">Cari</button>
+        <a href="{{ route('admin.destinasi.create') }}" class="btn-admin-primary" style="padding: 13.5px 24px; text-decoration: none;">
           + Tambah Destinasi
         </a>
-      </div>
+      </form>
 
-      <!-- Daftar 4 Destinasi (Grid 2 Kolom di Web) -->
+      <!-- Daftar Destinasi dari Database (Grid 2 Kolom di Web) -->
       <div class="admin-items-grid">
-        <!-- 1. Candi -->
-        <div class="admin-item-card" data-admin-dest-item>
-          <div class="admin-item-left">
-            <div class="admin-item-thumb"></div>
-            <div>
-              <div class="admin-item-title">Wahana Edukasi &amp; Outbound Candi</div>
-              <div class="admin-item-sub">Edukasi • Outbound</div>
+        @forelse ($destinasi as $item)
+          <div class="admin-item-card" data-admin-dest-item>
+            <div class="admin-item-left">
+              <div class="admin-item-thumb" style="background-image: url('{{ asset($item->foto ?: 'assets/images/candi.png') }}'); background-size: cover; background-position: center;"></div>
+              <div>
+                <div class="admin-item-title">{{ $item->nama }}</div>
+                <div class="admin-item-sub">{{ $item->kategori }} &bull; {{ $item->jam_buka ?: 'Setiap Hari' }}</div>
+              </div>
+            </div>
+            <div class="admin-item-right">
+              <span class="badge-tayang" data-item-badge>{{ $item->status }}</span>
+              <div class="admin-card-actions">
+                <a href="{{ route('admin.destinasi.edit', $item->slug) }}" class="admin-edit-link">Edit &#10095;</a>
+                <form action="{{ route('admin.destinasi.destroy', $item->slug) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus destinasi {{ $item->nama }}?');" style="display: inline;">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="admin-delete-link" style="background: none; border: none; cursor: pointer;">Hapus</button>
+                </form>
+              </div>
             </div>
           </div>
-          <div class="admin-item-right">
-            <span class="badge-tayang" data-item-badge>Tayang</span>
-            <div class="admin-card-actions">
-              <a href="{{ url('/admin-edit-destinasi.html?slug=candi') }}" class="admin-edit-link">Edit &#10095;</a>
-              <button type="button" class="admin-delete-link" data-delete-item="Wahana Edukasi & Outbound Candi">Hapus</button>
-            </div>
+        @empty
+          <div class="admin-panel-card" style="grid-column: 1 / -1; text-align: center; padding: 36px 20px;">
+            <p style="font-size: 15px; color: var(--text-muted); margin: 0;">Belum ada data destinasi wisata. Klik <strong>+ Tambah Destinasi</strong> untuk menambahkan.</p>
           </div>
-        </div>
-
-        <!-- 2. Embung -->
-        <div class="admin-item-card" data-admin-dest-item>
-          <div class="admin-item-left">
-            <div class="admin-item-thumb"></div>
-            <div>
-              <div class="admin-item-title">Embung Prabawulan</div>
-              <div class="admin-item-sub">Wisata alam</div>
-            </div>
-          </div>
-          <div class="admin-item-right">
-            <span class="badge-tayang" data-item-badge>Tayang</span>
-            <div class="admin-card-actions">
-              <a href="{{ url('/admin-edit-destinasi.html?slug=embung') }}" class="admin-edit-link">Edit &#10095;</a>
-              <button type="button" class="admin-delete-link" data-delete-item="Embung Prabawulan">Hapus</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Agro Kelengkeng -->
-        <div class="admin-item-card" data-admin-dest-item>
-          <div class="admin-item-left">
-            <div class="admin-item-thumb"></div>
-            <div>
-              <div class="admin-item-title">Agro Kelengkeng Thabet</div>
-              <div class="admin-item-sub">Agrowisata</div>
-            </div>
-          </div>
-          <div class="admin-item-right">
-            <span class="badge-tayang" data-item-badge>Tayang</span>
-            <div class="admin-card-actions">
-              <a href="{{ url('/admin-edit-destinasi.html?slug=kelengkeng') }}" class="admin-edit-link">Edit &#10095;</a>
-              <button type="button" class="admin-delete-link" data-delete-item="Agro Kelengkeng Thabet">Hapus</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. Petilasan -->
-        <div class="admin-item-card" data-admin-dest-item>
-          <div class="admin-item-left">
-            <div class="admin-item-thumb"></div>
-            <div>
-              <div class="admin-item-title">Petilasan Mbah Siti Benter</div>
-              <div class="admin-item-sub">Wisata budaya</div>
-            </div>
-          </div>
-          <div class="admin-item-right">
-            <span class="badge-tayang" data-item-badge>Tayang</span>
-            <div class="admin-card-actions">
-              <a href="{{ url('/admin-edit-destinasi.html?slug=petilasan') }}" class="admin-edit-link">Edit &#10095;</a>
-              <button type="button" class="admin-delete-link" data-delete-item="Petilasan Mbah Siti Benter">Hapus</button>
-            </div>
-          </div>
-        </div>
+        @endforelse
       </div>
 
       <!-- Info Box: Mudah kok! -->

@@ -50,6 +50,23 @@ class AdminAuthTest extends TestCase
         $this->assertEquals($admin->id, Auth::guard('admin')->id());
         $response->assertRedirect(route('admin.dashboard'));
     }
+    public function test_admin_can_authenticate_using_username(): void
+    {
+        $admin = Admin::factory()->create([
+            'username' => 'admin_bumdes',
+            'email' => 'admin@bumdes.id',
+            'password' => Hash::make('password123'),
+        ]);
+
+        $response = $this->post(route('admin.login.submit'), [
+            'login' => 'admin_bumdes',
+            'password' => 'password123',
+        ]);
+
+        $this->assertTrue(Auth::guard('admin')->check());
+        $this->assertEquals($admin->id, Auth::guard('admin')->id());
+        $response->assertRedirect(route('admin.dashboard'));
+    }
 
     public function test_admin_cannot_authenticate_with_invalid_password(): void
     {

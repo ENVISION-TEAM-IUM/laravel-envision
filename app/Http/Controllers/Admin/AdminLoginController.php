@@ -28,7 +28,7 @@ class AdminLoginController extends Controller
      */
     public function showLoginForm(): View
     {
-        return view('auth.login');
+        return view('admin.login');
     }
 
     /**
@@ -38,21 +38,45 @@ class AdminLoginController extends Controller
      */
     public function login(Request $request): RedirectResponse
     {
-        /** @var array{email: string, password: string} $credentials */
-        $credentials = $request->validate([
-            'email' => ['required', 'string', 'email'],
+        $input = $request->validate([
+            'login' => ['required_without:email', 'nullable', 'string'],
+            'email' => ['required_without:login', 'nullable', 'string'],
             'password' => ['required', 'string'],
         ]);
 
         $this->ensureIsNotRateLimited($request);
 
+        $loginValue = (string) ($input['login'] ?? $input['email']);
+        $fieldType = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $credentials = [
+            $fieldType => $loginValue,
+            'password' => $input['password'],
+        ];
+
         $remember = $request->boolean('remember');
 
         if (! Auth::guard('admin')->attempt($credentials, $remember)) {
+            if ($fieldType === 'username') {
+                $credentialsByName = [
+                    'name' => $loginValue,
+                    'password' => $input['password'],
+                ];
+
+                if (Auth::guard('admin')->attempt($credentialsByName, $remember)) {
+                    RateLimiter::clear($this->throttleKey($request));
+                    $request->session()->regenerate();
+
+                    return redirect()->intended(route('admin.dashboard'));
+                }
+            }
+
             RateLimiter::hit($this->throttleKey($request), $this->decaySeconds);
 
+            $errorField = $request->has('login') ? 'login' : 'email';
+
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                $errorField => trans('auth.failed'),
             ]);
         }
 
@@ -99,8 +123,10 @@ class AdminLoginController extends Controller
 
         $seconds = RateLimiter::availableIn($key);
 
+        $errorField = $request->has('login') ? 'login' : 'email';
+
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            $errorField => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => (int) ceil($seconds / 60),
             ]),
@@ -112,9 +138,9 @@ class AdminLoginController extends Controller
      */
     protected function throttleKey(Request $request): string
     {
-        $email = Str::lower((string) $request->input('email'));
+        $login = Str::lower((string) ($request->input('login') ?? $request->input('email')));
         $ip = (string) $request->ip();
 
-        return Str::transliterate("admin-login:{$email}|{$ip}");
+        return Str::transliterate("admin-login:{$login}|{$ip}");
     }
 }

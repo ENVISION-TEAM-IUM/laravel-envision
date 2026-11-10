@@ -43,25 +43,26 @@
           Gunakan akun admin yang diberikan pengelola.
         </p>
 
-        <!-- Kotak Pesan Error Login (Checklist E06-A Poin 4 & 7) -->
-        <div id="loginAlertBox" class="admin-login-alert" style="display: none;" role="alert">
+        <!-- Kotak Pesan Error Login -->
+        <div id="loginAlertBox" class="admin-login-alert" style="{{ $errors->any() ? 'display: flex;' : 'display: none;' }}" role="alert">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
-          <span id="loginAlertText"></span>
+          <span id="loginAlertText">{{ $errors->first('login') ?: $errors->first('email') ?: $errors->first('password') ?: 'Periksa kembali data login Anda.' }}</span>
         </div>
 
-        <form id="adminLoginForm" novalidate>
+        <form id="adminLoginForm" action="{{ route('admin.login.submit') }}" method="POST">
+          @csrf
           <div class="admin-form-group">
-            <label for="loginUsername">Nama pengguna</label>
-            <input type="text" id="loginUsername" class="admin-input" placeholder="Masukkan nama pengguna" value="admin_bumdes" autocomplete="username" required>
+            <label for="loginUsername">Nama pengguna / Email</label>
+            <input type="text" id="loginUsername" name="login" class="admin-input" placeholder="Masukkan nama pengguna atau email" value="{{ old('login', 'admin_bumdes') }}" autocomplete="username" required autofocus>
           </div>
 
           <div class="admin-form-group">
             <label for="loginPassword">Kata sandi</label>
-            <input type="password" id="loginPassword" class="admin-input" placeholder="Masukkan kata sandi" value="••••••••" autocomplete="current-password" required>
+            <input type="password" id="loginPassword" name="password" class="admin-input" placeholder="Masukkan kata sandi" autocomplete="current-password" required>
           </div>
 
           <button type="submit" id="loginSubmitBtn" class="btn-admin-primary" style="width: 100%; margin-top: 8px; padding: 15px;">
@@ -135,37 +136,13 @@
           return;
         }
 
-        // 3. Kondisi "Sedang masuk..." dan pencegahan pengiriman berulang (Checklist Poin 6)
+        // 3. Kondisi "Sedang masuk..." dan submit form ke server
         submitBtn.disabled = true;
         submitBtn.style.opacity = '0.75';
         submitBtn.style.cursor = 'not-allowed';
-        const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<span>Sedang masuk...</span>';
 
-        // 4. Simulasi proses autentikasi (Checklist Poin 7 & 8)
-        setTimeout(() => {
-          const isValidAdmin = (username === 'admin_bumdes' || username === 'admin');
-
-          if (isValidAdmin) {
-            // Login Berhasil -> Arahkan ke dashboard (Checklist Poin 8)
-            window.location.href = "{{ url('/admin-dashboard.html?login=success') }}";
-          } else {
-            // Login Gagal -> Tampilkan pesan error dan form tetap bisa dicoba (Checklist Poin 7 & 8)
-            failedAttempts++;
-            submitBtn.disabled = false;
-            submitBtn.style.opacity = '1';
-            submitBtn.style.cursor = 'pointer';
-            submitBtn.innerHTML = originalText;
-
-            if (failedAttempts >= MAX_ATTEMPTS) {
-              showAlert('Terlalu banyak percobaan gagal. Akses sementara dibatasi demi keamanan.');
-            } else {
-              showAlert('Nama pengguna atau kata sandi salah. Silakan periksa kembali.');
-            }
-            passwordInput.value = '';
-            passwordInput.focus();
-          }
-        }, 650);
+        loginForm.submit();
       });
     });
   </script>

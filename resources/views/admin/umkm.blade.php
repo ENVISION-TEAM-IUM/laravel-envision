@@ -19,94 +19,152 @@
           <p class="section-desc">Admin dapat mengelola beberapa profil UMKM desa serta produk yang dijual oleh masing-masing pelaku UMKM.</p>
         </div>
       </div>
+      @if (session('success'))
+        <div class="admin-alert" style="display: flex; background: #e8f5e9; border: 1px solid #c8e6c9; color: #2e7d32; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 600;">
+          {{ session('success') }}
+        </div>
+      @endif
+
+      @if ($errors->any())
+        <div class="admin-alert" style="display: flex; background: #ffebee; border: 1px solid #ffcdd2; color: #c62828; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 14px;">
+          <ul style="margin: 0; padding-left: 20px;">
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+
+      @php
+        $currentTab = request('tab', $activeTab ?? 'products');
+      @endphp
 
       <!-- Tab Switcher Bar: Produk UMKM vs Profil UMKM -->
       <div class="admin-tabs-bar" role="tablist">
-        <button type="button" class="admin-tab-btn active" id="tabBtnProducts" role="tab" aria-selected="true">
+        <a href="{{ route('admin.umkm.index', ['tab' => 'products']) }}" class="admin-tab-btn {{ $currentTab === 'products' ? 'active' : '' }}" style="text-decoration: none;">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
           <span>Daftar Produk UMKM</span>
-        </button>
-        <button type="button" class="admin-tab-btn" id="tabBtnProfiles" role="tab" aria-selected="false">
+        </a>
+        <a href="{{ route('admin.umkm.index', ['tab' => 'profiles']) }}" class="admin-tab-btn {{ $currentTab === 'profiles' ? 'active' : '' }}" style="text-decoration: none;">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
           <span>Profil Pelaku UMKM Desa</span>
-        </button>
+        </a>
       </div>
 
       <!-- ========================================================
-           TAB 1: KELOLA PRODUK UMKM (Setiap UMKM memiliki banyak produk)
+           TAB 1: KELOLA PRODUK UMKM
            ======================================================== -->
-      <div id="tabContentProducts">
+      <div id="tabContentProducts" style="{{ $currentTab === 'products' ? 'display: block;' : 'display: none;' }}">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
           <div style="display: flex; align-items: center; gap: 10px;">
             <label for="adminFilterProductByUmkm" style="font-size: 13.5px; font-weight: 700; color: var(--text-dark); white-space: nowrap;">Filter UMKM:</label>
-            <select id="adminFilterProductByUmkm" class="admin-select" style="width: 240px; min-width: 240px; max-width: 240px; padding: 7px 12px; font-size: 13.5px;">
-              <option value="all">Semua UMKM</option>
-              <!-- Diisi otomatis dari daftar profil UMKM -->
+            <select id="adminFilterProductByUmkm" class="admin-select" style="width: 240px; min-width: 240px; max-width: 240px; padding: 7px 12px; font-size: 13.5px;" onchange="window.location.href='{{ route('admin.umkm.index') }}?tab=products&filter_umkm='+this.value">
+              <option value="all" {{ request('filter_umkm') === 'all' || !request('filter_umkm') ? 'selected' : '' }}>Semua UMKM</option>
+              @foreach ($umkmList as $u)
+                <option value="{{ $u->id }}" {{ (string) request('filter_umkm') === (string) $u->id ? 'selected' : '' }}>{{ $u->nama_usaha }}</option>
+              @endforeach
             </select>
           </div>
-          <button type="button" class="btn-admin-primary" id="btnNewProduct">
+          <a href="{{ route('admin.umkm.index', ['tab' => 'products']) }}" class="btn-admin-primary" style="text-decoration: none;">
             + Tambah Produk Baru
-          </button>
+          </a>
         </div>
 
         <div class="admin-two-col">
           <!-- Kolom Kiri: Daftar Produk -->
-          <div style="display: flex; flex-direction: column; gap: 14px; min-width: 0; width: 100%;" id="adminProductsListContainer">
-            <!-- Rendered by JS -->
+          <div style="display: flex; flex-direction: column; gap: 14px; min-width: 0; width: 100%;">
+            @forelse ($products as $prod)
+              <div class="admin-item-card" style="{{ isset($selectedProduct) && $selectedProduct && $selectedProduct->id === $prod->id ? 'border: 2px solid var(--green-dark); background: #f0fdf4;' : '' }}">
+                <div class="admin-item-left">
+                  <div class="admin-item-thumb" style="background-image: url('{{ asset($prod->foto ?: 'assets/images/paket-1.jpeg') }}'); background-size: cover; background-position: center;"></div>
+                  <div>
+                    <div class="admin-item-title">{{ $prod->nama_produk }}</div>
+                    <div class="admin-item-sub">{{ $prod->harga }} &bull; {{ $prod->umkm->nama_usaha ?? 'UMKM Desa' }}</div>
+                  </div>
+                </div>
+                <div class="admin-item-right">
+                  <span class="badge-tayang">{{ $prod->status }}</span>
+                  <div class="admin-card-actions">
+                    <a href="{{ route('admin.umkm.index', ['tab' => 'products', 'edit_product' => $prod->slug]) }}" class="admin-edit-link" style="text-decoration: none;">Edit &#10095;</a>
+                    <form action="{{ route('admin.umkm.produk.destroy', $prod->slug) }}" method="POST" onsubmit="return confirm('Hapus produk {{ $prod->nama_produk }}?');" style="display: inline;">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="admin-delete-link" style="background: none; border: none; cursor: pointer;">Hapus</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            @empty
+              <div class="admin-panel-card" style="text-align: center; padding: 28px 16px;">
+                <p style="font-size: 14px; color: var(--text-muted); margin: 0;">Belum ada produk UMKM.</p>
+              </div>
+            @endforelse
           </div>
 
           <!-- Kolom Kanan: Form Tambah / Edit Produk UMKM -->
           <div style="min-width: 0; width: 100%;">
-            <form id="formUMKMProduct" class="admin-panel-card" style="margin-bottom: 0; width: 100%; box-sizing: border-box;">
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
-                <h2 class="admin-panel-title" id="prodFormHeaderTitle" style="margin-bottom: 0;">Edit Produk UMKM</h2>
-                <span class="badge-tayang" id="prodFormModeBadge" style="white-space: nowrap; flex-shrink: 0;">Mode: Edit</span>
-              </div>
-              <p class="admin-panel-sub" id="prodFormHeaderSub">Perbarui data produk, foto, harga, serta relasi UMKM pemiliknya.</p>
+            <form action="{{ isset($selectedProduct) && $selectedProduct ? route('admin.umkm.produk.update', $selectedProduct->slug) : route('admin.umkm.produk.store') }}" method="POST" enctype="multipart/form-data" class="admin-panel-card" style="margin-bottom: 0; width: 100%; box-sizing: border-box;">
+              @csrf
+              @if (isset($selectedProduct) && $selectedProduct)
+                @method('PUT')
+              @endif
 
-              <input type="hidden" id="prodFormId" value="">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
+                <h2 class="admin-panel-title" style="margin-bottom: 0;">
+                  {{ isset($selectedProduct) && $selectedProduct ? 'Edit Produk UMKM' : 'Tambah Produk Baru' }}
+                </h2>
+                <span class="badge-tayang" style="white-space: nowrap; flex-shrink: 0;">
+                  Mode: {{ isset($selectedProduct) && $selectedProduct ? 'Edit' : 'Tambah' }}
+                </span>
+              </div>
+              <p class="admin-panel-sub">Perbarui data produk, foto, harga, serta relasi UMKM pemiliknya.</p>
 
               <!-- Relasi ke UMKM -->
               <div class="admin-form-group">
                 <label for="prodFormUmkmId">UMKM Pemilik Produk *</label>
-                <select id="prodFormUmkmId" class="admin-select" required>
-                  <!-- Diisi otomatis dari daftar profil UMKM -->
+                <select id="prodFormUmkmId" name="umkm_id" class="admin-select" required>
+                  <option value="">-- Pilih UMKM Pemilik --</option>
+                  @foreach ($umkmList as $u)
+                    <option value="{{ $u->id }}" {{ (string) old('umkm_id', $selectedProduct->umkm_id ?? '') === (string) $u->id ? 'selected' : '' }}>
+                      {{ $u->nama_usaha }} ({{ $u->nama_pemilik }})
+                    </option>
+                  @endforeach
                 </select>
-                <span style="display: block; font-size: 12px; color: var(--text-muted); margin-top: 4px;">Pilih UMKM yang memproduksi barang ini. Kontak pemesanan akan otomatis diarahkan ke WhatsApp UMKM ini.</span>
               </div>
 
               <!-- Nama Produk -->
               <div class="admin-form-group">
                 <label for="prodFormName">Nama Produk *</label>
-                <input type="text" id="prodFormName" class="admin-input" placeholder="Contoh: Tahu Karangkemiri Super" required>
+                <input type="text" id="prodFormName" name="nama_produk" class="admin-input" placeholder="Contoh: Tahu Karangkemiri Super" value="{{ old('nama_produk', $selectedProduct->nama_produk ?? '') }}" required>
               </div>
 
               <!-- Kategori & Status -->
               <div class="admin-form-grid">
                 <div class="admin-form-group">
                   <label for="prodFormCat">Kategori Produk *</label>
-                  <select id="prodFormCat" class="admin-select">
-                    <option value="makanan">Makanan Olahan</option>
-                    <option value="kerajinan">Kerajinan Tangan</option>
-                    <option value="tani">Hasil Pertanian / Ternak</option>
-                    <option value="lokal">Produk Lokal Lainnya</option>
+                  <select id="prodFormCat" name="kategori" class="admin-select">
+                    @php $curProdCat = old('kategori', $selectedProduct->kategori ?? 'makanan'); @endphp
+                    <option value="makanan" {{ $curProdCat === 'makanan' ? 'selected' : '' }}>Makanan Olahan</option>
+                    <option value="kerajinan" {{ $curProdCat === 'kerajinan' ? 'selected' : '' }}>Kerajinan Tangan</option>
+                    <option value="tani" {{ $curProdCat === 'tani' ? 'selected' : '' }}>Hasil Pertanian / Ternak</option>
+                    <option value="lokal" {{ $curProdCat === 'lokal' ? 'selected' : '' }}>Produk Lokal Lainnya</option>
                   </select>
                 </div>
                 <div class="admin-form-group">
                   <label for="prodFormStatus">Status Publikasi *</label>
-                  <select id="prodFormStatus" class="admin-select">
-                    <option value="Tayang">Tayang (Aktif di Katalog)</option>
-                    <option value="Nonaktif">Nonaktif (Stok Kosong / Arsip)</option>
-                    <option value="Draf">Draf (Belum Tayang)</option>
+                  <select id="prodFormStatus" name="status" class="admin-select">
+                    @php $curProdStatus = old('status', $selectedProduct->status ?? 'Tayang'); @endphp
+                    <option value="Tayang" {{ $curProdStatus === 'Tayang' ? 'selected' : '' }}>Tayang (Aktif di Katalog)</option>
+                    <option value="Nonaktif" {{ $curProdStatus === 'Nonaktif' ? 'selected' : '' }}>Nonaktif (Stok Kosong / Arsip)</option>
+                    <option value="Draf" {{ $curProdStatus === 'Draf' ? 'selected' : '' }}>Draf (Belum Tayang)</option>
                   </select>
-                  <span style="display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 3px;">Pilih <strong>Nonaktif</strong> bila stok habis agar tidak tampil di website publik.</span>
                 </div>
               </div>
 
               <!-- Harga Produk -->
               <div class="admin-form-group">
                 <label for="prodFormPrice">Harga / Keterangan Harga *</label>
-                <input type="text" id="prodFormPrice" class="admin-input" placeholder="Contoh: Rp 15.000 / bungkus atau Hubungi Penjual" required>
+                <input type="text" id="prodFormPrice" name="harga" class="admin-input" placeholder="Contoh: Rp 15.000 / bungkus" value="{{ old('harga', $selectedProduct->harga ?? '') }}" required>
               </div>
 
               <!-- Pengelolaan Foto Produk -->
@@ -114,34 +172,32 @@
                 <label>Foto Produk</label>
                 <div style="display: flex; gap: 14px; align-items: center; margin-top: 6px;">
                   <div style="width: 80px; height: 80px; border-radius: 12px; overflow: hidden; background: #eef3ec; border: 1px solid var(--border-light); flex-shrink: 0;">
-                    <img id="prodFormPhotoPreview" src="/assets/images/paket-1.jpeg" alt="Pratinjau Foto Produk" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img id="prodFormPhotoPreview" src="{{ asset(($selectedProduct && $selectedProduct->foto) ? $selectedProduct->foto : 'assets/images/paket-1.jpeg') }}" alt="Pratinjau" style="width: 100%; height: 100%; object-fit: cover;">
                   </div>
                   <div style="flex: 1;">
-                    <input type="file" id="prodFormPhotoInput" accept="image/*" class="admin-input" style="padding: 7px; font-size: 12.5px;">
-                    <span id="prodFormPhotoLabel" style="display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">Pilih file JPG/PNG/WEBP (Maksimal 5MB).</span>
+                    <input type="file" id="prodFormPhotoInput" name="foto" accept="image/*" class="admin-input" style="padding: 7px; font-size: 12.5px;" onchange="previewImageUpload(this, 'prodFormPhotoPreview')">
                   </div>
                 </div>
               </div>
 
               <!-- Deskripsi Produk -->
               <div class="admin-form-group">
-                <label for="prodFormDesc">Deskripsi Singkat Produk</label>
-                <textarea id="prodFormDesc" class="admin-textarea" rows="3" style="resize: vertical;" placeholder="Deskripsi bahan, keunggulan, atau ukuran kemasan produk..."></textarea>
+                <label for="prodFormDesc">Deskripsi Produk</label>
+                <textarea id="prodFormDesc" name="deskripsi" class="admin-textarea" rows="3" placeholder="Jelaskan keistimewaan rasa, bahan baku, daya tahan simpan...">{{ old('deskripsi', $selectedProduct->deskripsi ?? '') }}</textarea>
               </div>
 
-              <!-- Form Buttons Simetris -->
-              <div class="admin-form-actions-bar">
+              <!-- Form Buttons -->
+              <div class="admin-form-actions-bar" style="display: flex; justify-content: space-between; align-items: center;">
                 <div class="admin-form-actions-left">
-                  <button type="button" class="btn-admin-danger" id="btnDeleteProduct" style="display: inline-block;">
-                    Hapus
-                  </button>
+                  @if (isset($selectedProduct) && $selectedProduct)
+                    <a href="{{ route('admin.umkm.index', ['tab' => 'products']) }}" class="btn-admin-secondary" style="text-decoration: none;">
+                      Batal Edit
+                    </a>
+                  @endif
                 </div>
                 <div class="admin-form-actions-right">
-                  <button type="button" class="btn-admin-secondary" id="btnCancelProductEdit">
-                    Batal
-                  </button>
                   <button type="submit" class="btn-admin-primary">
-                    Simpan Produk UMKM
+                    {{ isset($selectedProduct) && $selectedProduct ? 'Simpan Perubahan' : 'Tambah Produk' }}
                   </button>
                 </div>
               </div>
@@ -151,55 +207,88 @@
       </div>
 
       <!-- ========================================================
-           TAB 2: KELOLA PROFIL UMKM (Profil Usaha, Alamat, WA, Jam Buka)
+           TAB 2: KELOLA PROFIL UMKM
            ======================================================== -->
-      <div id="tabContentProfiles" style="display: none;">
+      <div id="tabContentProfiles" style="{{ $currentTab === 'profiles' ? 'display: block;' : 'display: none;' }}">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
           <div>
             <h2 class="section-title" style="font-size: 20px; margin-bottom: 4px;">Daftar Pelaku UMKM Karangkemiri</h2>
             <p class="section-desc" style="margin-bottom: 0;">Setiap profil UMKM dapat menampung banyak produk dan nomor WhatsApp penjual.</p>
           </div>
-          <button type="button" class="btn-admin-primary" id="btnNewUmkmProfile">
+          <a href="{{ route('admin.umkm.index', ['tab' => 'profiles']) }}" class="btn-admin-primary" style="text-decoration: none;">
             + Tambah Profil UMKM Baru
-          </button>
+          </a>
         </div>
 
         <div class="admin-two-col">
           <!-- Kolom Kiri: Daftar Profil UMKM -->
-          <div style="display: flex; flex-direction: column; gap: 14px; min-width: 0; width: 100%;" id="adminUmkmProfilesListContainer">
-            <!-- Rendered by JS -->
+          <div style="display: flex; flex-direction: column; gap: 14px; min-width: 0; width: 100%;">
+            @forelse ($umkmList as $u)
+              <div class="admin-item-card" style="{{ isset($selectedUmkm) && $selectedUmkm && $selectedUmkm->id === $u->id ? 'border: 2px solid var(--green-dark); background: #f0fdf4;' : '' }}">
+                <div class="admin-item-left">
+                  <div class="admin-item-thumb" style="background-image: url('{{ asset($u->foto ?: 'assets/images/paket-1.jpeg') }}'); background-size: cover; background-position: center;"></div>
+                  <div>
+                    <div class="admin-item-title">{{ $u->nama_usaha }}</div>
+                    <div class="admin-item-sub">{{ $u->nama_pemilik }} &bull; {{ $u->sektor_usaha }} &bull; {{ count($u->produk) }} Produk</div>
+                  </div>
+                </div>
+                <div class="admin-item-right">
+                  <span class="badge-tayang">{{ $u->status }}</span>
+                  <div class="admin-card-actions">
+                    <a href="{{ route('admin.umkm.index', ['tab' => 'profiles', 'edit_umkm' => $u->slug]) }}" class="admin-edit-link" style="text-decoration: none;">Edit &#10095;</a>
+                    <form action="{{ route('admin.umkm.destroy', $u->slug) }}" method="POST" onsubmit="return confirm('Hapus profil {{ $u->nama_usaha }}? Semua produk di bawah UMKM ini akan ikut terhapus.');" style="display: inline;">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="admin-delete-link" style="background: none; border: none; cursor: pointer;">Hapus</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            @empty
+              <div class="admin-panel-card" style="text-align: center; padding: 28px 16px;">
+                <p style="font-size: 14px; color: var(--text-muted); margin: 0;">Belum ada profil UMKM.</p>
+              </div>
+            @endforelse
           </div>
 
           <!-- Kolom Kanan: Form Tambah / Edit Profil UMKM -->
           <div style="min-width: 0; width: 100%;">
-            <form id="formUMKMProfile" class="admin-panel-card" style="margin-bottom: 0; width: 100%; box-sizing: border-box;">
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
-                <h2 class="admin-panel-title" id="umkmProfileFormTitle" style="margin-bottom: 0;">Edit Profil UMKM</h2>
-                <span class="badge-tayang" id="umkmProfileFormModeBadge" style="white-space: nowrap; flex-shrink: 0;">Mode: Edit</span>
-              </div>
-              <p class="admin-panel-sub" id="umkmProfileFormSub">Lengkapi profil tempat usaha, kontak WhatsApp, dan jam operasional pengrajin/penjual.</p>
+            <form action="{{ isset($selectedUmkm) && $selectedUmkm ? route('admin.umkm.update', $selectedUmkm->slug) : route('admin.umkm.store') }}" method="POST" enctype="multipart/form-data" class="admin-panel-card" style="margin-bottom: 0; width: 100%; box-sizing: border-box;">
+              @csrf
+              @if (isset($selectedUmkm) && $selectedUmkm)
+                @method('PUT')
+              @endif
 
-              <input type="hidden" id="umkmProfileId" value="">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; flex-wrap: wrap;">
+                <h2 class="admin-panel-title" style="margin-bottom: 0;">
+                  {{ isset($selectedUmkm) && $selectedUmkm ? 'Edit Profil UMKM' : 'Tambah Profil UMKM' }}
+                </h2>
+                <span class="badge-tayang" style="white-space: nowrap; flex-shrink: 0;">
+                  Mode: {{ isset($selectedUmkm) && $selectedUmkm ? 'Edit' : 'Tambah' }}
+                </span>
+              </div>
+              <p class="admin-panel-sub">Lengkapi profil tempat usaha, kontak WhatsApp, dan jam operasional pengrajin/penjual.</p>
 
               <!-- Nama Usaha UMKM -->
               <div class="admin-form-group">
                 <label for="umkmProfileName">Nama Usaha / Merk UMKM *</label>
-                <input type="text" id="umkmProfileName" class="admin-input" placeholder="Contoh: UMKM Sari Kedelai" required>
+                <input type="text" id="umkmProfileName" name="nama_usaha" class="admin-input" placeholder="Contoh: UMKM Sari Kedelai" value="{{ old('nama_usaha', $selectedUmkm->nama_usaha ?? '') }}" required>
               </div>
 
               <!-- Nama Pemilik & Kategori Sektor -->
               <div class="admin-form-grid">
                 <div class="admin-form-group">
                   <label for="umkmProfileOwner">Nama Pemilik / Pengelola *</label>
-                  <input type="text" id="umkmProfileOwner" class="admin-input" placeholder="Contoh: Ibu Siti Khodijah" required>
+                  <input type="text" id="umkmProfileOwner" name="nama_pemilik" class="admin-input" placeholder="Contoh: Ibu Siti Khodijah" value="{{ old('nama_pemilik', $selectedUmkm->nama_pemilik ?? '') }}" required>
                 </div>
                 <div class="admin-form-group">
                   <label for="umkmProfileCat">Sektor Usaha *</label>
-                  <select id="umkmProfileCat" class="admin-select">
-                    <option value="Makanan olahan">Makanan Olahan</option>
-                    <option value="Produk lokal">Produk Lokal</option>
-                    <option value="Kerajinan tangan">Kerajinan Tangan</option>
-                    <option value="Hasil pertanian">Hasil Pertanian / Ternak</option>
+                  <select id="umkmProfileCat" name="sektor_usaha" class="admin-select">
+                    @php $curUmkmSec = old('sektor_usaha', $selectedUmkm->sektor_usaha ?? 'Makanan Olahan'); @endphp
+                    <option value="Makanan Olahan" {{ $curUmkmSec === 'Makanan Olahan' ? 'selected' : '' }}>Makanan Olahan</option>
+                    <option value="Produk Lokal" {{ $curUmkmSec === 'Produk Lokal' ? 'selected' : '' }}>Produk Lokal</option>
+                    <option value="Kerajinan Tangan" {{ $curUmkmSec === 'Kerajinan Tangan' ? 'selected' : '' }}>Kerajinan Tangan</option>
+                    <option value="Hasil Pertanian" {{ $curUmkmSec === 'Hasil Pertanian' ? 'selected' : '' }}>Hasil Pertanian / Ternak</option>
                   </select>
                 </div>
               </div>
@@ -208,40 +297,62 @@
               <div class="admin-form-grid">
                 <div class="admin-form-group">
                   <label for="umkmProfileWa">Kontak WhatsApp Penjual *</label>
-                  <input type="text" id="umkmProfileWa" class="admin-input" placeholder="08xxxxxxxxxx" required>
-                  <span style="display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 3px;">Pemesanan produk dari UMKM ini akan masuk ke nomor WhatsApp ini.</span>
+                  <input type="text" id="umkmProfileWa" name="nomor_wa" class="admin-input" placeholder="0857xxxxxxxx" value="{{ old('nomor_wa', $selectedUmkm->nomor_wa ?? '') }}" required>
                 </div>
                 <div class="admin-form-group">
-                  <label for="umkmProfileHours">Jam Operasional Layanan *</label>
-                  <input type="text" id="umkmProfileHours" class="admin-input" placeholder="Contoh: Setiap Hari, 07:00 – 17:00 WIB" required>
+                  <label for="umkmProfileHours">Jam Operasional Layanan</label>
+                  <input type="text" id="umkmProfileHours" name="jam_operasional" class="admin-input" placeholder="Contoh: Setiap Hari, 07:00 – 17:00 WIB" value="{{ old('jam_operasional', $selectedUmkm->jam_operasional ?? '') }}">
                 </div>
+              </div>
+
+              <!-- Status Tampil -->
+              <div class="admin-form-group">
+                <label for="umkmProfileStatus">Status Publikasi *</label>
+                <select id="umkmProfileStatus" name="status" class="admin-select">
+                  @php $curUmkmStat = old('status', $selectedUmkm->status ?? 'Tayang'); @endphp
+                  <option value="Tayang" {{ $curUmkmStat === 'Tayang' ? 'selected' : '' }}>Tayang (Aktif di Website)</option>
+                  <option value="Nonaktif" {{ $curUmkmStat === 'Nonaktif' ? 'selected' : '' }}>Nonaktif (Arsip)</option>
+                  <option value="Draf" {{ $curUmkmStat === 'Draf' ? 'selected' : '' }}>Draf</option>
+                </select>
               </div>
 
               <!-- Alamat Lengkap -->
               <div class="admin-form-group">
-                <label for="umkmProfileAddress">Alamat Lengkap / Dusun *</label>
-                <textarea id="umkmProfileAddress" class="admin-textarea" rows="2" style="resize: vertical;" placeholder="RT 03 / RW 01 Dusun Karang Jengkol, Desa Karangkemiri..." required></textarea>
+                <label for="umkmProfileAddress">Alamat Lengkap / Dusun</label>
+                <textarea id="umkmProfileAddress" name="alamat" class="admin-textarea" rows="2" style="resize: vertical;" placeholder="RT 03 / RW 01 Dusun Karang Jengkol, Desa Karangkemiri...">{{ old('alamat', $selectedUmkm->alamat ?? '') }}</textarea>
               </div>
 
               <!-- Deskripsi Usaha -->
               <div class="admin-form-group">
                 <label for="umkmProfileDesc">Deskripsi Usaha</label>
-                <textarea id="umkmProfileDesc" class="admin-textarea" rows="3" style="resize: vertical;" placeholder="Cerita singkat usaha, sejarah produksi, atau keunggulan produk UMKM..."></textarea>
+                <textarea id="umkmProfileDesc" name="deskripsi" class="admin-textarea" rows="3" style="resize: vertical;" placeholder="Cerita singkat usaha, sejarah produksi, atau keunggulan produk UMKM...">{{ old('deskripsi', $selectedUmkm->deskripsi ?? '') }}</textarea>
               </div>
 
-              <!-- Form Buttons Simetris -->
-              <div class="admin-form-actions-bar">
+              <!-- Foto Profil Usaha -->
+              <div class="admin-form-group">
+                <label>Foto Tempat Usaha / Produk Utama</label>
+                <div style="display: flex; gap: 14px; align-items: center; margin-top: 6px;">
+                  <div style="width: 80px; height: 80px; border-radius: 12px; overflow: hidden; background: #eef3ec; border: 1px solid var(--border-light); flex-shrink: 0;">
+                    <img id="umkmFormPhotoPreview" src="{{ asset(($selectedUmkm && $selectedUmkm->foto) ? $selectedUmkm->foto : 'assets/images/paket-1.jpeg') }}" alt="Pratinjau" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <div style="flex: 1;">
+                    <input type="file" id="umkmFormPhotoInput" name="foto" accept="image/*" class="admin-input" style="padding: 7px; font-size: 12.5px;" onchange="previewImageUpload(this, 'umkmFormPhotoPreview')">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Form Buttons -->
+              <div class="admin-form-actions-bar" style="display: flex; justify-content: space-between; align-items: center;">
                 <div class="admin-form-actions-left">
-                  <button type="button" class="btn-admin-danger" id="btnDeleteUmkmProfile" style="display: inline-block;">
-                    Hapus
-                  </button>
+                  @if (isset($selectedUmkm) && $selectedUmkm)
+                    <a href="{{ route('admin.umkm.index', ['tab' => 'profiles']) }}" class="btn-admin-secondary" style="text-decoration: none;">
+                      Batal Edit
+                    </a>
+                  @endif
                 </div>
                 <div class="admin-form-actions-right">
-                  <button type="button" class="btn-admin-secondary" id="btnCancelUmkmProfileEdit">
-                    Batal
-                  </button>
                   <button type="submit" class="btn-admin-primary">
-                    Simpan Profil UMKM
+                    {{ isset($selectedUmkm) && $selectedUmkm ? 'Simpan Perubahan' : 'Simpan Profil UMKM' }}
                   </button>
                 </div>
               </div>

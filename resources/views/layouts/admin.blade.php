@@ -25,6 +25,42 @@
       } catch (e) {}
     })();
   </script>
+  <script>
+    function previewImageUpload(input, previewId, nameDisplayId) {
+      if (!input || !input.files || !input.files[0]) return;
+      var file = input.files[0];
+      if (nameDisplayId) {
+        var nameEl = document.getElementById(nameDisplayId);
+        if (nameEl) {
+          var sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+          nameEl.textContent = 'Foto dipilih: ' + file.name + ' (' + sizeMB + ' MB)';
+          nameEl.style.display = 'block';
+        }
+      }
+      var target = document.getElementById(previewId);
+      if (!target) return;
+      if (window.FileReader) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          if (target.tagName === 'IMG') {
+            target.src = e.target.result;
+          } else {
+            target.style.backgroundImage = 'url(' + e.target.result + ')';
+          }
+        };
+        reader.readAsDataURL(file);
+      } else if (window.URL && typeof window.URL.createObjectURL === 'function') {
+        try {
+          var url = window.URL.createObjectURL(file);
+          if (target.tagName === 'IMG') {
+            target.src = url;
+          } else {
+            target.style.backgroundImage = 'url(' + url + ')';
+          }
+        } catch (err) {}
+      }
+    }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@yield('title', 'Admin CMS - Desa Wisata Karangkemiri')</title>
   <link rel="shortcut icon" href="{{ asset('assets/images/logo-desa-wisata-karangkemiri.png') }}" type="image/png">
@@ -304,7 +340,10 @@
         </li>
 
         <li>
-          <a href="{{ url('/admin-login.html') }}" data-tooltip="Log out">
+          <form id="adminSidebarLogoutForm" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+            @csrf
+          </form>
+          <a href="{{ route('admin.logout') }}" onclick="event.preventDefault(); document.getElementById('adminSidebarLogoutForm').submit();" data-tooltip="Log out">
             <span class="sidebar-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -350,9 +389,8 @@
         <img src="{{ asset('assets/images/logo-desa-wisata-karangkemiri.png') }}" alt="Admin BUMDesa">
       </div>
       <div class="sidebar-user-info">
-        <span class="sidebar-user-name">Admin BUMDesa</span>
-        <span class="sidebar-user-email">mandirisejahtera@gmail.com</span>
-      </div>
+        <span class="sidebar-user-name">{{ Auth::guard('admin')->user()->name ?? 'Admin BUMDesa' }}</span>
+        <span class="sidebar-user-email">{{ Auth::guard('admin')->user()->email ?? 'mandirisejahtera@gmail.com' }}</span>
 
       <div class="sidebar-profile-popup" id="sidebarProfilePopup">
         <div class="profile-popup-header">
@@ -360,9 +398,8 @@
             <img src="{{ asset('assets/images/logo-desa-wisata-karangkemiri.png') }}" alt="Admin BUMDesa">
           </div>
           <div class="sidebar-user-info">
-            <span class="sidebar-user-name">Admin BUMDesa</span>
-            <span class="sidebar-user-email">mandirisejahtera@gmail.com</span>
-          </div>
+            <span class="sidebar-user-name">{{ Auth::guard('admin')->user()->name ?? 'Admin BUMDesa' }}</span>
+            <span class="sidebar-user-email">{{ Auth::guard('admin')->user()->email ?? 'mandirisejahtera@gmail.com' }}</span>
         </div>
         <ul class="profile-popup-links">
           <li>
@@ -383,7 +420,12 @@
               <span>Buka Website Publik</span>
             </a>
           </li>
-        </ul>
+          <li>
+            <a href="{{ route('admin.logout') }}" onclick="event.preventDefault(); document.getElementById('adminSidebarLogoutForm').submit();" style="color: #dc2626;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <span>Log out</span>
+            </a>
+          </li>
         <div class="profile-popup-version">v2.0 &bull; CMS BUMDesa Mandiri Sejahtera</div>
       </div>
     </div>
