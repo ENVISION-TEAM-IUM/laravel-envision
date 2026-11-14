@@ -77,7 +77,9 @@ while IFS= read -r -d '' file; do
     test ! -e "$file" || fail "Untracked/ignored file collision: $file"
   fi
 done < <(git diff --no-renames --name-only -z "$OLD_SHA" "$SHA")
-if git ls-tree -r "$SHA" | grep -q '^120000 '; then fail 'Tracked symlinks require separate review'; fi
+if git ls-tree -r "$SHA" | grep '^120000 '; then
+  fail 'Tracked symlinks require separate review'
+fi
 
 verify_database() {
   php -r '
