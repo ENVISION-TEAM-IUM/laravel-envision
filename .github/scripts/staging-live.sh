@@ -96,8 +96,9 @@ verify_database() {
 }
 
 backup_database() {
-  php -r 'SQLite3::enableExceptions(true);$source=new SQLite3($argv[1],SQLITE3_OPEN_READONLY);$target=new SQLite3($argv[2],SQLITE3_OPEN_READWRITE|SQLITE3_OPEN_CREATE);$source->busyTimeout(10000);$target->busyTimeout(10000);if(!$source->backup($target)||$target->querySingle("PRAGMA integrity_check")!=="ok"){exit(1);}$target->close();$source->close();' "$APP/database/database.sqlite" "$1"
+  php -r '$source=new SQLite3($argv[1],SQLITE3_OPEN_READONLY);$target=new SQLite3($argv[2],SQLITE3_OPEN_READWRITE|SQLITE3_OPEN_CREATE);$source->enableExceptions(true);$target->enableExceptions(true);$source->busyTimeout(10000);$target->busyTimeout(10000);if(!$source->backup($target)||$target->querySingle("PRAGMA integrity_check")!=="ok"){exit(1);}$target->close();$source->close();' "$APP/database/database.sqlite" "$1"
 }
+
 
 verify_database
 if test "$PHASE" = prepare; then
