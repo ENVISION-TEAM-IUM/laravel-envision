@@ -66,17 +66,26 @@ if test -n "$CHANGED"; then
   done
 fi
 # Git may overwrite ignored files. Reject collisions, symlink parents, and hardlinks first.
+
+git diff --no-renames --name-only -z "$OLD_SHA" "$SHA" |
 while IFS= read -r -d '' file; do
   path="$APP/$file"
+
   while test "$path" != "$APP"; do
     test ! -L "$path" || fail "Symlink in changed path: $file"
-    if test -f "$path"; then test "$(stat -c %h "$path")" = 1; fi
+
+    if test -f "$path"; then
+      test "$(stat -c %h "$path")" = 1
+    fi
+
     path=$(dirname "$path")
   done
+
   if ! git cat-file -e "$OLD_SHA:$file" 2>/dev/null; then
     test ! -e "$file" || fail "Untracked/ignored file collision: $file"
   fi
-done < <(git diff --no-renames --name-only -z "$OLD_SHA" "$SHA")
+done
+
 if git ls-tree -r "$SHA" | grep '^120000 '; then
   fail 'Tracked symlinks require separate review'
 fi
