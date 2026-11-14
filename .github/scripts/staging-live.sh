@@ -81,33 +81,15 @@ if git ls-tree -r "$SHA" | grep '^120000 '; then
   fail 'Tracked symlinks require separate review'
 fi
 
+
 verify_database() {
-  php -r '
-    require "vendor/autoload.php";
-    $app = require "bootstrap/app.php";
-    $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-    $expected = getcwd()."/database/database.sqlite";
-    if (config("database.default") !== "sqlite"
-        || realpath((string) config("database.connections.sqlite.database")) !== $expected
-        || config("app.maintenance.driver") !== "file"
-        || $app->storagePath() !== getcwd()."/storage") {
-        fwrite(STDERR, "Unsafe database, storage, or maintenance configuration\n"); exit(1);
-    }
-    $db = \Illuminate\Support\Facades\DB::connection()->getPdo();
-    if ($db->query("PRAGMA integrity_check")->fetchColumn() !== "ok") { exit(1); }
-    echo "Staging database target and integrity verified\n";
-  '
+  php -r 'require "vendor/autoload.php";$app=require "bootstrap/app.php";$app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();$expected=getcwd()."/database/database.sqlite";if(config("database.default")!=="sqlite"||realpath((string)config("database.connections.sqlite.database"))!==$expected||config("app.maintenance.driver")!=="file"||$app->storagePath()!==getcwd()."/storage"){fwrite(STDERR,"Unsafe database, storage, or maintenance configuration\n");exit(1);}$db=\Illuminate\Support\Facades\DB::connection()->getPdo();if($db->query("PRAGMA integrity_check")->fetchColumn()!=="ok"){exit(1);}echo "Staging database target and integrity verified\n";'
 }
+
 backup_database() {
-  php -r '
-    SQLite3::enableExceptions(true);
-    $source = new SQLite3($argv[1], SQLITE3_OPEN_READONLY);
-    $target = new SQLite3($argv[2], SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
-    $source->busyTimeout(10000); $target->busyTimeout(10000);
-    if (!$source->backup($target) || $target->querySingle("PRAGMA integrity_check") !== "ok") { exit(1); }
-    $target->close(); $source->close();
-  ' "$APP/database/database.sqlite" "$1"
+  php -r 'SQLite3::enableExceptions(true);$source=new SQLite3($argv[1],SQLITE3_OPEN_READONLY);$target=new SQLite3($argv[2],SQLITE3_OPEN_READWRITE|SQLITE3_OPEN_CREATE);$source->busyTimeout(10000);$target->busyTimeout(10000);if(!$source->backup($target)||$target->querySingle("PRAGMA integrity_check")!=="ok"){exit(1);}$target->close();$source->close();' "$APP/database/database.sqlite" "$1"
 }
+
 verify_database
 if test "$PHASE" = prepare; then
   test ! -e "$BACKUP" && test ! -L "$BACKUP"
