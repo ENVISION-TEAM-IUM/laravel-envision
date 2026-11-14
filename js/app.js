@@ -333,6 +333,10 @@ function initCategoryFilters() {
 function initDestinationDetail() {
   const detailContainer = document.getElementById('detailDestinasiPage');
   if (!detailContainer) return;
+  const mainEl = document.getElementById('detailDestinasiMain');
+  if (mainEl && mainEl.dataset.serverRendered === 'true') {
+    return;
+  }
 
   const renderSlug = (slug) => {
     const data = DESTINATIONS_DATA[slug] || DESTINATIONS_DATA.candi;
@@ -503,7 +507,7 @@ function initFeedbackModal() {
   });
 
   if (feedbackForm) {
-    feedbackForm.addEventListener('submit', (e) => {
+    feedbackForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const f1 = document.getElementById('rateFasilitas')?.value || '0';
       const f2 = document.getElementById('rateKebersihan')?.value || '0';
@@ -514,13 +518,42 @@ function initFeedbackModal() {
         return;
       }
 
-      feedbackForm.reset();
-      setRating('rateFasilitas', 5);
-      setRating('rateKebersihan', 5);
-      setRating('ratePelayanan', 5);
-      if (counterEl) counterEl.textContent = '0/500';
-      closeModal();
-      showCustomPopup('Masukan Terkirim', 'Terima kasih! Masukan Anda telah disimpan secara privat untuk bahan evaluasi pengelola BUMDesa Mandiri Sejahtera.', 'Tutup');
+      const submitBtn = feedbackForm.querySelector('button[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        const formData = new FormData(feedbackForm);
+        const targetUrl = feedbackForm.getAttribute('action') || '/feedback';
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+          || formData.get('_token');
+
+        const response = await fetch(targetUrl, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': csrfToken || '',
+          },
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          feedbackForm.reset();
+          setRating('rateFasilitas', 0);
+          setRating('rateKebersihan', 0);
+          setRating('ratePelayanan', 0);
+          if (counterEl) counterEl.textContent = '0/500';
+          closeModal();
+          showCustomPopup('Masukan Terkirim', data.message || 'Terima kasih! Masukan Anda telah disimpan secara privat untuk bahan evaluasi pengelola BUMDesa Mandiri Sejahtera.', 'Tutup');
+        } else {
+          showCustomPopup('Perhatian', data.message || 'Gagal mengirim masukan. Silakan coba beberapa saat lagi.', 'Mengerti');
+        }
+      } catch (err) {
+        showCustomPopup('Perhatian', 'Terjadi kendala jaringan saat mengirim masukan. Silakan coba lagi.', 'Mengerti');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
     });
   }
 }
@@ -1150,9 +1183,16 @@ function initPublicProfile() {
   const pubTitleEl = document.getElementById('pubProfTitle');
   if (!pubTitleEl) return;
 
-  const saved = getSavedProfileData();
-  if (!saved) return;
+  // Pada Laravel, konten halaman publik dirender langsung oleh Blade dari database
+  const isBladeRendered = Boolean(document.querySelector('.site-footer') || document.querySelector('.top-navbar'));
+  if (isBladeRendered) {
+    return;
+  }
 
+  const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+  if (!raw) return;
+  const saved = safeJsonParse(raw, null);
+  if (!saved) return;
   const heroCaptionEl = document.getElementById('pubProfHeroCaption');
   const historyEl = document.getElementById('pubProfHistory');
   const potensiDescEl = document.getElementById('pubProfPotensiDesc');
@@ -1327,9 +1367,10 @@ function initProfileCMS() {
     syncLivePreview();
   };
 
-  // Muat data yang pernah disimpan di localStorage jika ada
+  // Muat data yang pernah disimpan di localStorage jika ada (hanya jika tanpa backend action)
+  const hasBackendProfile = profileForm && profileForm.getAttribute('action');
   const existingData = getSavedProfileData();
-  if (existingData) {
+  if (!hasBackendProfile && existingData) {
     populateForm(existingData);
   } else {
     syncLivePreview();
@@ -1407,7 +1448,6 @@ function initProfileCMS() {
 
   // Handler Submit Simpan Perubahan Profil
   profileForm.addEventListener('submit', (e) => {
-    e.preventDefault();
     hideAlert();
 
     const requiredChecks = [
@@ -1424,12 +1464,18 @@ function initProfileCMS() {
 
     for (const check of requiredChecks) {
       if (check.el && !check.el.value.trim()) {
+        e.preventDefault();
         showAlert(`Kolom "${check.name}" wajib diisi sebelum menyimpan perubahan.`);
         check.el.focus();
         return;
       }
     }
 
+    if (profileForm.getAttribute('action')) {
+      return;
+    }
+
+    e.preventDefault();
     const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
     const payload = {
       title: titleInput ? titleInput.value.trim() : DEFAULT_PROFILE_DATA.title,
@@ -1470,7 +1516,7 @@ function initProfileCMS() {
   });
 
   // Handler Reset ke Default
-  if (resetBtn) {
+  if (resetBtn && !resetBtn.hasAttribute('form')) {
     resetBtn.addEventListener('click', () => {
       try {
         localStorage.removeItem(PROFILE_STORAGE_KEY);
@@ -1900,6 +1946,37 @@ function initAdminPackages() {
 function initPublicPackages() {
   const container = document.getElementById('publicPackageList');
   if (!container) return;
+  // Bind detail package buttons
+  const bindDetailBtns = (parentEl) => {
+    if (!parentEl) return;
+    parentEl.querySelectorAll('[data-view-pkg-detail]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-view-pkg-detail');
+        const pkgs = getSavedPackages();
+        let p = pkgs.find((item) => item.id === id || item.slug === id);
+        if (!p) {
+          p = {
+            id: id,
+            name: btn.getAttribute('data-pkg-name') || btn.getAttribute('data-pkg-title') || 'Paket Wisata',
+            price: btn.getAttribute('data-pkg-price') || '',
+            description: btn.getAttribute('data-pkg-desc') || '',
+            facilities: btn.getAttribute('data-pkg-facilities') || '',
+            destinasi: btn.getAttribute('data-pkg-destinasi') || '',
+            umkm: btn.getAttribute('data-pkg-umkm') || '',
+            waNumber: btn.getAttribute('data-pkg-wa') || '6285702573013',
+            image: btn.getAttribute('data-pkg-image') || '',
+          };
+        }
+        openPackageDetailModal(p);
+      });
+    });
+  };
+
+  if (container.dataset.serverRendered === 'true' || container.children.length > 0) {
+    bindDetailBtns(container);
+    bindDetailBtns(document);
+    return;
+  }
 
   const packages = getSavedPackages();
   // Filter HANYA paket yang berstatus Aktif
@@ -2188,12 +2265,17 @@ function initAdminContact() {
       input.addEventListener('input', updateLivePreview);
     });
 
-  // Tampilkan data yang tersimpan saat pertama kali halaman dibuka
-  const currentData = getSavedContact();
-  populateForm(currentData);
+  // Tampilkan data yang tersimpan saat pertama kali halaman dibuka (hanya jika tanpa backend action)
+  const hasBackendContact = form && form.getAttribute('action');
+  if (!hasBackendContact) {
+    const currentData = getSavedContact();
+    populateForm(currentData);
+  } else {
+    updateLivePreview();
+  }
 
   // Tombol Reset ke Pengaturan Default
-  if (btnReset) {
+  if (btnReset && !btnReset.hasAttribute('form')) {
     btnReset.addEventListener('click', () => {
       if (confirm('Apakah Anda yakin ingin mengembalikan seluruh informasi kontak & lokasi ke data asli Karangkemiri?')) {
         saveContact(DEFAULT_CONTACT_DATA);
@@ -2209,8 +2291,10 @@ function initAdminContact() {
 
   // Handle Form Submit
   form.addEventListener('submit', (e) => {
+    if (form.getAttribute('action')) {
+      return;
+    }
     e.preventDefault();
-
     const newData = {
       address: addrInput ? addrInput.value.trim() : DEFAULT_CONTACT_DATA.address,
       whatsapp: waInput ? waInput.value.trim() : DEFAULT_CONTACT_DATA.whatsapp,
@@ -2240,7 +2324,18 @@ function initAdminContact() {
 
 /* 9b. Halaman Publik: Tampilkan Kontak, WhatsApp, Medsos & Peta Interaktif */
 function initPublicContact() {
-  const contact = getSavedContact();
+  // Pada Laravel, informasi kontak & peta interaktif sudah dirender lengkap oleh Blade dari database
+  const isBladeRendered = Boolean(document.querySelector('.site-footer') || document.querySelector('.top-navbar'));
+  if (isBladeRendered) {
+    return;
+  }
+
+  const raw = localStorage.getItem(CONTACT_STORAGE_KEY);
+  if (!raw) {
+    return;
+  }
+  const contact = safeJsonParse(raw, null);
+  if (!contact) return;
   const cleanWa = cleanWhatsAppNumber(contact.whatsapp);
   const waGreeting = encodeURIComponent('Halo Admin BUMDesa Karangkemiri, saya mau bertanya seputar kunjungan/reservasi.');
 
@@ -2249,7 +2344,6 @@ function initPublicContact() {
   const addrText = document.getElementById('pubContactAddrText');
   if (addrText) addrText.textContent = contact.address;
   if (addrLink) addrLink.href = contact.mapsUrl || 'https://maps.google.com';
-
   // 2. WhatsApp Item
   const waLink = document.getElementById('pubContactWaLink');
   const waText = document.getElementById('pubContactWaText');
@@ -3190,6 +3284,59 @@ function initPublicUMKM() {
   const categoryPillsContainer = document.getElementById('publicCategoryFilterPills');
 
   if (!gridContainer) return;
+  let activeCategory = 'semua';
+  let activeUmkm = 'all';
+
+  if (gridContainer.dataset.serverRendered === 'true') {
+    const filterDomProducts = () => {
+      const cards = gridContainer.querySelectorAll('.umkm-card');
+      let visibleCount = 0;
+      cards.forEach((card) => {
+        const cat = (card.getAttribute('data-category') || '').toLowerCase();
+        const umkmId = card.getAttribute('data-umkm-id') || '';
+        const matchCat = activeCategory === 'semua' || cat === activeCategory.toLowerCase();
+        const matchUmkm = activeUmkm === 'all' || umkmId === activeUmkm;
+        if (matchCat && matchUmkm) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      let emptyMsg = gridContainer.querySelector('.empty-filter-state');
+      if (visibleCount === 0) {
+        if (!emptyMsg) {
+          emptyMsg = document.createElement('div');
+          emptyMsg.className = 'admin-panel-card empty-state-card empty-filter-state';
+          emptyMsg.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 44px 20px;';
+          emptyMsg.innerHTML = '<h3 style="font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px;">Belum Ada Produk yang Sesuai</h3><p style="color: var(--text-muted); font-size: 14px;">Silakan pilih kategori atau UMKM lain.</p>';
+          gridContainer.appendChild(emptyMsg);
+        }
+        emptyMsg.style.display = '';
+      } else if (emptyMsg) {
+        emptyMsg.style.display = 'none';
+      }
+    };
+
+    if (categoryPillsContainer) {
+      categoryPillsContainer.querySelectorAll('[data-filter-btn]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          categoryPillsContainer.querySelectorAll('[data-filter-btn]').forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeCategory = btn.getAttribute('data-filter-btn') || 'semua';
+          filterDomProducts();
+        });
+      });
+    }
+
+    if (filterUmkmSelect) {
+      filterUmkmSelect.addEventListener('change', () => {
+        activeUmkm = filterUmkmSelect.value;
+        filterDomProducts();
+      });
+    }
+    return;
+  }
 
   const profiles = getSavedUmkmProfiles();
   const products = getSavedUmkmProducts();
@@ -3417,6 +3564,23 @@ function initDigitalTracker() {
   // Jangan catat halaman admin / login sebagai pengunjung publik
   if (path.includes('admin') || path.includes('login')) return;
 
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+  try {
+    fetch('/track-event', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': csrfToken,
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        halaman: window.location.pathname || '/',
+        tipe: 'kunjungan',
+      }),
+    }).catch(() => {});
+  } catch (e) {}
+
   const stats = getSavedAnalytics();
 
   // Tentukan Page Key
@@ -3468,6 +3632,23 @@ function initDigitalTracker() {
 
       currentStats.waInquiries[waType] = (currentStats.waInquiries[waType] || 0) + 1;
       saveAnalytics(currentStats);
+
+      try {
+        const textTarget = btn.getAttribute('data-public-pkg') || btn.textContent.trim().slice(0, 50);
+        fetch('/track-event', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            halaman: window.location.pathname || '/',
+            tipe: 'klik_wa',
+            target: textTarget,
+          }),
+        }).catch(() => {});
+      } catch (e) {}
     });
   });
 }
@@ -3491,12 +3672,12 @@ function initDashboardAnalytics() {
   // Update jumlah paket & umkm aktif pada kartu ringkasan atas
   const dashTotalPackages = document.getElementById('dashTotalPackages');
   const dashTotalUmkm = document.getElementById('dashTotalUmkm');
-  if (dashTotalPackages) {
+  if (dashTotalPackages && dashTotalPackages.dataset.serverRendered !== 'true') {
     const pkgs = getSavedPackages();
     const activeCount = pkgs.filter((p) => p.status === 'Aktif' || p.status === 'Tayang').length;
     dashTotalPackages.textContent = activeCount || '2';
   }
-  if (dashTotalUmkm) {
+  if (dashTotalUmkm && dashTotalUmkm.dataset.serverRendered !== 'true') {
     const profiles = getSavedUmkmProfiles();
     dashTotalUmkm.textContent = profiles.length || '4';
   }

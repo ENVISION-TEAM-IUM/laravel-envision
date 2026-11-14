@@ -40,65 +40,40 @@
 
       <!-- Destination Cards -->
       <div class="cards-stack">
-        <!-- 1. Candi -->
-        <a href="{{ url('/detail-destinasi.html?slug=candi') }}" class="horiz-card" data-category="edukasi">
-          <div class="thumb-box" style="background-image: linear-gradient(180deg, rgba(14, 68, 33, 0.15) 0%, rgba(14, 68, 33, 0.72) 100%), url('{{ asset('assets/images/candi.png') }}'); background-size: cover; background-position: center;">
-            <span>Candi</span>
-          </div>
-          <div class="card-body">
-            <h2 class="card-title">Wahana Edukasi &amp; Outbound Candi</h2>
-            <p class="card-subtitle">Permainan outbound, ketangkasan kelompok, flying fox, panahan, dan kegiatan edukasi luar ruang</p>
-            <div class="card-meta-bottom">
-              <span class="meta-tag-small">Edukasi &amp; Outbound</span>
-              <span class="price-tag">Mulai Rp 75.000 – Rp 100.000</span>
+        @forelse ($destinasiList as $item)
+          @php
+            $catLower = strtolower($item->kategori);
+            $catFilter = 'semua,' . $catLower;
+            if (str_contains($catLower, 'alam')) {
+              $catFilter .= ',alam';
+            }
+            if (str_contains($catLower, 'edukasi') || str_contains($catLower, 'outbound') || str_contains($catLower, 'agro')) {
+              $catFilter .= ',edukasi';
+            }
+            if (str_contains($catLower, 'budaya') || str_contains($catLower, 'religi')) {
+              $catFilter .= ',budaya';
+            }
+            $fotoUrl = $item->foto ? asset($item->foto) : asset('assets/images/candi.png');
+          @endphp
+          <a href="{{ route('detail-destinasi.slug', ['slug' => $item->slug]) }}" class="horiz-card" data-category="{{ $catFilter }}">
+            <div class="thumb-box" style="background-image: linear-gradient(180deg, rgba(14, 68, 33, 0.15) 0%, rgba(14, 68, 33, 0.72) 100%), url('{{ $fotoUrl }}'); background-size: cover; background-position: center;">
+              <span>{{ Str::limit($item->nama, 10, '') }}</span>
             </div>
-          </div>
-        </a>
-
-        <!-- 2. Embung Prabawulan -->
-        <a href="{{ url('/detail-destinasi.html?slug=embung') }}" class="horiz-card" data-category="alam">
-          <div class="thumb-box" style="background-image: linear-gradient(180deg, rgba(14, 68, 33, 0.15) 0%, rgba(14, 68, 33, 0.72) 100%), url('{{ asset('assets/images/camping-ground.jpeg') }}'); background-size: cover; background-position: center;">
-            <span>Embung</span>
-          </div>
-          <div class="card-body">
-            <h2 class="card-title">Embung Prabawulan</h2>
-            <p class="card-subtitle">Ruang rekreasi keluarga, pemandangan danau buatan, bersantai, memancing, dan budidaya ikan</p>
-            <div class="card-meta-bottom">
-              <span class="meta-tag-small">Wisata Alam</span>
-              <span class="price-tag">Konfirmasi Pengelola</span>
+            <div class="card-body">
+              <h2 class="card-title">{{ $item->nama }}</h2>
+              <p class="card-subtitle">{{ Str::limit($item->deskripsi, 140) }}</p>
+              <div class="card-meta-bottom">
+                <span class="meta-tag-small">{{ $item->kategori }}</span>
+                <span class="price-tag">{{ $item->harga_tiket ?? 'Konfirmasi Pengelola' }}</span>
+              </div>
             </div>
+          </a>
+        @empty
+          <div class="admin-panel-card empty-state-card" style="text-align: center; padding: 44px 20px;">
+            <h3 style="font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 8px;">Belum Ada Destinasi</h3>
+            <p style="color: var(--text-muted); font-size: 14px;">Destinasi wisata Desa Karangkemiri akan segera ditayangkan.</p>
           </div>
-        </a>
-
-        <!-- 3. Agro Kelengkeng Thabet -->
-        <a href="{{ url('/detail-destinasi.html?slug=kelengkeng') }}" class="horiz-card" data-category="alam,edukasi">
-          <div class="thumb-box" style="background-image: linear-gradient(180deg, rgba(14, 68, 33, 0.15) 0%, rgba(14, 68, 33, 0.72) 100%), url('{{ asset('assets/images/whatsapp-image-2025-12-30-at-16.55.33.jpeg') }}'); background-size: cover; background-position: center;">
-            <span>Buah</span>
-          </div>
-          <div class="card-body">
-            <h2 class="card-title">Agro Kelengkeng Thabet</h2>
-            <p class="card-subtitle">Agrowisata kebun kelengkeng unggulan desa, edukasi budidaya, dan petik buah musiman</p>
-            <div class="card-meta-bottom">
-              <span class="meta-tag-small">Agrowisata</span>
-              <span class="price-tag">Konfirmasi Pengelola</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- 4. Petilasan Mbah Siti Benter -->
-        <a href="{{ url('/detail-destinasi.html?slug=petilasan') }}" class="horiz-card" data-category="budaya">
-          <div class="thumb-box" style="background-image: linear-gradient(180deg, rgba(14, 68, 33, 0.15) 0%, rgba(14, 68, 33, 0.72) 100%), url('{{ asset('assets/images/sadranan.jpeg') }}'); background-size: cover; background-position: center;">
-            <span>Budaya</span>
-          </div>
-          <div class="card-body">
-            <h2 class="card-title">Petilasan Mbah Siti Benter</h2>
-            <p class="card-subtitle">Kekayaan sejarah lokal, tradisi Sedekah Bumi, Sadranan, dan pelestarian budaya leluhur</p>
-            <div class="card-meta-bottom">
-              <span class="meta-tag-small">Wisata Budaya</span>
-              <span class="price-tag">Konfirmasi Pengelola</span>
-            </div>
-          </div>
-        </a>
+        @endforelse
       </div>
     </main>
 @endsection

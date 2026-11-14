@@ -50,6 +50,7 @@ class AdminAuthTest extends TestCase
         $this->assertEquals($admin->id, Auth::guard('admin')->id());
         $response->assertRedirect(route('admin.dashboard'));
     }
+
     public function test_admin_can_authenticate_using_username(): void
     {
         $admin = Admin::factory()->create([

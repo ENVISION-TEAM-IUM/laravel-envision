@@ -19,24 +19,30 @@
           <p class="section-desc" style="margin-bottom: 0;">Formulir pengelolaan profil, sejarah, visi, misi, struktur organisasi, serta foto pendukung Desa Wisata Karangkemiri.</p>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="badge-tayang" id="profStatusBadge">Tayang di Website</span>
-          <span id="profLastSaved" style="font-size: 12.5px; color: var(--text-muted); font-weight: 600;">Tersinkronisasi</span>
+          <span class="{{ $profil->status === 'Tayang' ? 'badge-tayang' : 'badge-draf' }}" id="profStatusBadge">{{ $profil->status }} di Website</span>
+          <span id="profLastSaved" style="font-size: 12.5px; color: var(--text-muted); font-weight: 600;">{{ $profil->updated_at ? 'Diperbarui: '.$profil->updated_at->format('d/m/Y H:i') : 'Tersinkronisasi' }}</span>
         </div>
       </div>
 
-      <!-- Alert Validasi Form Profil -->
-      <div id="profFormAlert" class="admin-login-alert" style="display: none;" role="alert">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <span id="profFormAlertText"></span>
-      </div>
+      @if (session('success'))
+        <div class="admin-alert" style="display: flex; background: #e8f5e9; border: 1px solid #c8e6c9; color: #2e7d32; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 600;">
+          {{ session('success') }}
+        </div>
+      @endif
 
-      <form id="adminProfileForm" data-admin-save-form data-save-msg="Informasi Profil Desa berhasil diperbarui dan disinkronkan ke halaman publik!" novalidate>
+      @if ($errors->any())
+        <div class="admin-alert" style="display: flex; background: #ffebee; border: 1px solid #ffcdd2; color: #c62828; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 14px;">
+          <ul style="margin: 0; padding-left: 20px;">
+            @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
+
+      <form id="adminProfileForm" action="{{ route('admin.profil.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
-
+        @method('PUT')
         <!-- 1. Pengelolaan Struktur Organisasi serta Foto Pendukung -->
         <div class="admin-panel-card">
           <h2 class="admin-panel-title">1. Foto Utama, Struktur Organisasi &amp; Foto Pendukung</h2>
@@ -47,16 +53,16 @@
             <div class="admin-photo-box" style="margin-bottom: 0;">
               <div class="admin-photo-left" style="flex: 1; min-width: 0;">
                 <div class="admin-photo-thumb" id="profMainPhotoThumb" style="overflow: hidden; padding: 0; position: relative; flex-shrink: 0;">
-                  <img id="profMainPhotoPreview" src="{{ asset('assets/images/candi.png') }}" alt="Foto Utama Desa" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                  <img id="profMainPhotoPreview" src="{{ asset($profil->main_photo ?: 'assets/images/candi.png') }}" alt="Foto Utama Desa" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                 </div>
                 <div style="min-width: 0;">
                   <div style="font-size: 16px; font-weight: 800; color: var(--text-dark);">Foto utama desa *</div>
-                  <div id="profMainPhotoName" style="font-size: 13px; color: var(--text-muted); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">candi.png (Terverifikasi)</div>
+                  <div id="profMainPhotoName" style="font-size: 13px; color: var(--text-muted); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ basename($profil->main_photo ?: 'candi.png') }}</div>
                 </div>
               </div>
               <label class="btn-admin-secondary" style="cursor: pointer; flex-shrink: 0; white-space: nowrap;">
                 <span>Ganti Foto</span>
-                <input type="file" id="profMainPhotoInput" name="main_photo" accept="image/jpeg,image/png,image/webp" style="display: none;">
+                <input type="file" id="profMainPhotoInput" name="main_photo" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="previewImageUpload(this, 'profMainPhotoPreview', 'profMainPhotoName')">
               </label>
             </div>
 
@@ -64,16 +70,16 @@
             <div class="admin-photo-box" style="margin-bottom: 0;">
               <div class="admin-photo-left" style="flex: 1; min-width: 0;">
                 <div class="admin-photo-thumb" id="profStructPhotoThumb" style="overflow: hidden; padding: 0; position: relative; flex-shrink: 0;">
-                  <img id="profStructPhotoPreview" src="{{ asset('assets/images/struktur-unit-wisata.png') }}" alt="Struktur Organisasi" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                  <img id="profStructPhotoPreview" src="{{ asset($profil->structure_photo ?: 'assets/images/struktur-unit-wisata.png') }}" alt="Struktur Organisasi" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                 </div>
                 <div style="min-width: 0;">
                   <div style="font-size: 16px; font-weight: 800; color: var(--text-dark);">Bagan struktur organisasi *</div>
-                  <div id="profStructPhotoName" style="font-size: 13px; color: var(--text-muted); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">struktur-unit-wisata.png (Terverifikasi)</div>
+                  <div id="profStructPhotoName" style="font-size: 13px; color: var(--text-muted); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ basename($profil->structure_photo ?: 'struktur-unit-wisata.png') }}</div>
                 </div>
               </div>
               <label class="btn-admin-secondary" style="cursor: pointer; flex-shrink: 0; white-space: nowrap;">
                 <span>Ganti Bagan</span>
-                <input type="file" id="profStructPhotoInput" name="structure_photo" accept="image/jpeg,image/png,image/webp" style="display: none;">
+                <input type="file" id="profStructPhotoInput" name="structure_photo" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="previewImageUpload(this, 'profStructPhotoPreview', 'profStructPhotoName')">
               </label>
             </div>
 
@@ -81,16 +87,16 @@
             <div class="admin-photo-box" style="margin-bottom: 0;">
               <div class="admin-photo-left" style="flex: 1; min-width: 0;">
                 <div class="admin-photo-thumb" id="profSupportPhotoThumb" style="overflow: hidden; padding: 0; position: relative; flex-shrink: 0;">
-                  <img id="profSupportPhotoPreview" src="{{ asset('assets/images/penghargaan-ldwn-peringkat-ke-13-nasional-2023.jpeg') }}" alt="Penghargaan LDWN 2023" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                  <img id="profSupportPhotoPreview" src="{{ asset($profil->support_photo ?: 'assets/images/penghargaan-ldwn-peringkat-ke-13-nasional-2023.jpeg') }}" alt="Penghargaan LDWN 2023" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                 </div>
                 <div style="min-width: 0;">
                   <div style="font-size: 16px; font-weight: 800; color: var(--text-dark);">Foto pendukung &amp; penghargaan desa</div>
-                  <div id="profSupportPhotoName" style="font-size: 13px; color: var(--text-muted); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">penghargaan-ldwn-peringkat-ke-13-nasional-2023.jpeg (Terverifikasi)</div>
+                  <div id="profSupportPhotoName" style="font-size: 13px; color: var(--text-muted); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ basename($profil->support_photo ?: 'penghargaan-ldwn-peringkat-ke-13-nasional-2023.jpeg') }}</div>
                 </div>
               </div>
               <label class="btn-admin-secondary" style="cursor: pointer; flex-shrink: 0; white-space: nowrap;">
                 <span>Ganti Foto Pendukung</span>
-                <input type="file" id="profSupportPhotoInput" name="support_photo" accept="image/jpeg,image/png,image/webp" style="display: none;">
+                <input type="file" id="profSupportPhotoInput" name="support_photo" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="previewImageUpload(this, 'profSupportPhotoPreview', 'profSupportPhotoName')">
               </label>
             </div>
           </div>
@@ -104,26 +110,24 @@
           <div class="admin-form-grid">
             <div class="admin-form-group">
               <label for="profTitle">Judul profil desa *</label>
-              <input type="text" id="profTitle" name="title" class="admin-input" value="Profil Desa Wisata Karangkemiri" placeholder="Contoh: Profil Desa Wisata Karangkemiri" required>
+              <input type="text" id="profTitle" name="title" class="admin-input" value="{{ old('title', $profil->title) }}" placeholder="Contoh: Profil Desa Wisata Karangkemiri" required>
             </div>
-
             <div class="admin-form-group">
               <label for="profHeroCaption">Caption banner utama *</label>
-              <input type="text" id="profHeroCaption" name="hero_caption" class="admin-input" value="Mengenal desa kami" placeholder="Contoh: Mengenal desa kami" required>
+              <input type="text" id="profHeroCaption" name="hero_caption" class="admin-input" value="{{ old('hero_caption', $profil->hero_caption) }}" placeholder="Contoh: Mengenal desa kami" required>
             </div>
           </div>
 
           <div class="admin-form-grid">
             <div class="admin-form-group">
               <label for="profSummary">Ringkasan singkat desa *</label>
-              <input type="text" id="profSummary" name="summary" class="admin-input" value="Pengalaman wisata berbasis masyarakat yang memadukan alam, budaya, edukasi, dan rekreasi." placeholder="Ringkasan satu kalimat tentang desa" required>
+              <input type="text" id="profSummary" name="summary" class="admin-input" value="{{ old('summary', $profil->summary) }}" placeholder="Ringkasan satu kalimat tentang desa" required>
             </div>
-
             <div class="admin-form-group">
               <label for="profStatus">Status publikasi halaman *</label>
               <select id="profStatus" name="status" class="admin-select">
-                <option value="Tayang" selected>Tayang (Tampil di Website Publik)</option>
-                <option value="Draf">Draf (Disimpan Sementara)</option>
+                <option value="Tayang" {{ old('status', $profil->status) === 'Tayang' ? 'selected' : '' }}>Tayang (Tampil di Website Publik)</option>
+                <option value="Draf" {{ old('status', $profil->status) === 'Draf' ? 'selected' : '' }}>Draf (Disimpan Sementara)</option>
               </select>
             </div>
           </div>
@@ -131,24 +135,22 @@
           <div class="admin-form-grid">
             <div class="admin-form-group">
               <label for="profHistory">Deskripsi &amp; sejarah desa wisata *</label>
-              <textarea id="profHistory" name="history" class="admin-textarea" rows="5" placeholder="Tuliskan sejarah dan deskripsi desa." required>Desa Wisata Karangkemiri terletak di Kecamatan Karanglewas, Kabupaten Banyumas, Jawa Tengah, sekitar 15 menit dari pusat Kota Purwokerto. Berada di kawasan pedesaan yang asri dengan hamparan persawahan dan udara yang sejuk, desa ini menawarkan pengalaman wisata berbasis masyarakat yang memadukan alam, budaya, edukasi, dan rekreasi.</textarea>
+              <textarea id="profHistory" name="history" class="admin-textarea" rows="5" placeholder="Tuliskan sejarah dan deskripsi desa." required>{{ old('history', $profil->history) }}</textarea>
             </div>
-
             <div class="admin-form-group">
               <label for="profPotensiDesc">Keunikan potensi &amp; sejarah lokal *</label>
-              <textarea id="profPotensiDesc" name="potensi_desc" class="admin-textarea" rows="5" placeholder="Tuliskan keunikan potensi alam dan situs sejarah desa." required>Keunikan Desa Wisata Karangkemiri terletak pada keberagaman potensi yang saling terintegrasi. Daya tarik utamanya meliputi Wahana Edukasi dan Outbound Candi dengan berbagai wahana rekreasi keluarga dan outbound, Embung Prabawulan sebagai ruang rekreasi dan pemancingan, serta Agro Kelengkeng Thabet yang mengangkat potensi pertanian unggulan desa. Desa ini juga memiliki kekayaan sejarah melalui Petilasan Mbah Siti Benter, Panembahan Mbah Suryangalam, dan Makam Buyut Mbah Mertajaya.</textarea>
+              <textarea id="profPotensiDesc" name="potensi_desc" class="admin-textarea" rows="5" placeholder="Tuliskan keunikan potensi alam dan situs sejarah desa." required>{{ old('potensi_desc', $profil->potensi_desc) }}</textarea>
             </div>
           </div>
 
           <div class="admin-form-grid">
             <div class="admin-form-group" style="margin-bottom: 0;">
               <label for="profCultureDesc">Warisan budaya &amp; produk UMKM warga *</label>
-              <textarea id="profCultureDesc" name="culture_desc" class="admin-textarea" rows="4" placeholder="Tuliskan tradisi budaya dan produk UMKM desa." required>Warisan budaya tetap lestari melalui tradisi Sedekah Bumi, Sadranan, Wayang Clebek, Lengger Banyumasan, Kenthongan, dan Hadroh. Wisatawan juga dapat menikmati produk UMKM dan home industry seperti peyek, gula jawa, tahu, anyaman bambu, serta kerajinan kain perca. Seluruh potensi tersebut dikelola oleh BUMDesa Mandiri Sejahtera bersama masyarakat sebagai wujud pengembangan pariwisata yang berkelanjutan, edukatif, dan berdampak pada peningkatan ekonomi desa.</textarea>
+              <textarea id="profCultureDesc" name="culture_desc" class="admin-textarea" rows="4" placeholder="Tuliskan tradisi budaya dan produk UMKM desa." required>{{ old('culture_desc', $profil->culture_desc) }}</textarea>
             </div>
-
             <div class="admin-form-group" style="margin-bottom: 0;">
               <label for="profAccess">Aksesibilitas &amp; rute perjalanan</label>
-              <textarea id="profAccess" name="access_info" class="admin-textarea" rows="4" placeholder="Tuliskan kemudahan akses menuju lokasi desa wisata.">Desa Wisata Karangkemiri berlokasi di Kecamatan Karanglewas, Kabupaten Banyumas, Jawa Tengah, dengan akses yang mudah dijangkau menggunakan kendaraan pribadi maupun transportasi daring. Dari Stasiun Purwokerto, perjalanan menuju lokasi berjarak sekitar 7 km dengan waktu tempuh kurang lebih 15–20 menit. Dari Bandara Jenderal Besar Soedirman (Purbalingga) sekitar 45–60 menit, dan dari Yogyakarta International Airport (YIA) sekitar 3–4 jam. Akses jalan dalam kondisi baik dan dapat dilalui kendaraan roda dua, roda empat, maupun bus pariwisata.</textarea>
+              <textarea id="profAccess" name="access_info" class="admin-textarea" rows="4" placeholder="Tuliskan kemudahan akses menuju lokasi desa wisata.">{{ old('access_info', $profil->access_info) }}</textarea>
             </div>
           </div>
         </div>
@@ -161,17 +163,15 @@
           <div class="admin-form-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
             <div class="admin-form-group" style="margin-bottom: 0;">
               <label for="profSince">Tahun berdiri (Sejak) *</label>
-              <input type="text" id="profSince" name="since_year" class="admin-input" value="2017" placeholder="Contoh: 2017" required>
+              <input type="text" id="profSince" name="since_year" class="admin-input" value="{{ old('since_year', $profil->since_year) }}" placeholder="Contoh: 2017" required>
             </div>
-
             <div class="admin-form-group" style="margin-bottom: 0;">
               <label for="profManager">Lembaga pengelola *</label>
-              <input type="text" id="profManager" name="manager" class="admin-input" value="BUMDesa Mandiri Sejahtera" placeholder="Contoh: BUMDesa Mandiri Sejahtera" required>
+              <input type="text" id="profManager" name="manager" class="admin-input" value="{{ old('manager', $profil->manager) }}" placeholder="Contoh: BUMDesa Mandiri Sejahtera" required>
             </div>
-
             <div class="admin-form-group" style="margin-bottom: 0;">
               <label for="profFocus">Fokus pengembangan *</label>
-              <input type="text" id="profFocus" name="focus" class="admin-input" value="Wisata & UMKM" placeholder="Contoh: Wisata & UMKM" required>
+              <input type="text" id="profFocus" name="focus" class="admin-input" value="{{ old('focus', $profil->focus) }}" placeholder="Contoh: Wisata & UMKM" required>
             </div>
           </div>
         </div>
@@ -183,29 +183,23 @@
 
           <div class="admin-form-group">
             <label for="profVisionTitle">Judul bagian visi *</label>
-            <input type="text" id="profVisionTitle" name="vision_title" class="admin-input" value="Visi" placeholder="Contoh: Visi" required>
+            <input type="text" id="profVisionTitle" name="vision_title" class="admin-input" value="{{ old('vision_title', $profil->vision_title) }}" placeholder="Contoh: Visi" required>
           </div>
 
           <div class="admin-form-grid">
             <div class="admin-form-group">
               <label for="profVision">Visi desa wisata *</label>
-              <textarea id="profVision" name="vision" class="admin-textarea" rows="3" placeholder="Tuliskan visi desa wisata." required>“Terwujudnya Desa Wisata Karangkemiri yang berbasis potensi lokal, dikelola bersama dengan semangat gotong royong, serta memberikan manfaat bagi masyarakat.”</textarea>
+              <textarea id="profVision" name="vision" class="admin-textarea" rows="3" placeholder="Tuliskan visi desa wisata." required>{{ old('vision', $profil->vision) }}</textarea>
             </div>
-
             <div class="admin-form-group">
               <label for="profGoal">Tujuan pengembangan desa wisata *</label>
-              <textarea id="profGoal" name="goal" class="admin-textarea" rows="3" placeholder="Tuliskan tujuan pengembangan desa wisata." required>Mengembangkan Desa Wisata Karangkemiri sebagai ruang wisata, belajar, dan berkegiatan berbasis potensi lokal melalui keterlibatan dan gotong royong masyarakat, sehingga memberikan pengalaman yang baik bagi pengunjung serta manfaat bagi masyarakat desa.</textarea>
+              <textarea id="profGoal" name="goal" class="admin-textarea" rows="3" placeholder="Tuliskan tujuan pengembangan desa wisata." required>{{ old('goal', $profil->goal) }}</textarea>
             </div>
           </div>
 
           <div class="admin-form-group" style="margin-bottom: 0;">
             <label for="profMission">Misi pengembangan desa (Satu poin misi per baris) *</label>
-            <textarea id="profMission" name="mission" class="admin-textarea" rows="6" placeholder="Tuliskan poin-poin misi, pisahkan dengan baris baru (Enter)." required>Mengembangkan potensi lokal berupa alam, budaya, sejarah, pertanian, dan kearifan masyarakat sebagai daya tarik wisata.
-Meningkatkan kualitas wisata melalui pelayanan, fasilitas, kegiatan edukasi, rekreasi, dan outbound yang aman dan nyaman.
-Mendorong keterlibatan masyarakat dan generasi muda dalam pengelolaan dan pengembangan Desa Wisata.
-Mendukung UMKM dan usaha masyarakat agar dapat tumbuh melalui kegiatan pariwisata.
-Melestarikan budaya dan tradisi desa sebagai bagian dari identitas dan daya tarik wisata.
-Membangun kerja sama dan gotong royong antara pengelola, masyarakat, pemerintah, pelaku usaha, dan berbagai pihak dalam mengembangkan pariwisata desa.</textarea>
+            <textarea id="profMission" name="mission" class="admin-textarea" rows="6" placeholder="Tuliskan poin-poin misi, pisahkan dengan baris baru (Enter)." required>{{ old('mission', $profil->mission) }}</textarea>
           </div>
         </div>
 
@@ -261,14 +255,17 @@ Membangun kerja sama dan gotong royong antara pengelola, masyarakat, pemerintah,
         <!-- Baris Tombol Aksi Simetris -->
         <div class="admin-form-actions-bar">
           <div class="admin-form-actions-left">
-            <button type="button" id="resetProfileBtn" class="btn-admin-secondary">Reset ke Awal</button>
-            <a href="{{ url('/admin-pratinjau.html') }}" class="btn-admin-secondary">Lihat Pratinjau</a>
+            <button type="submit" form="resetProfileForm" class="btn-admin-secondary" onclick="return confirm('Apakah Anda yakin ingin mengembalikan formulir profil desa ke pengaturan awal bawaan?')">Reset ke Awal</button>
+            <a href="{{ route('admin.pratinjau') }}" class="btn-admin-secondary">Lihat Pratinjau</a>
           </div>
           <div class="admin-form-actions-right">
-            <a href="{{ url('/admin-kontak.html') }}" class="btn-admin-secondary">Edit Kontak &#10095;</a>
+            <a href="{{ route('admin.kontak') }}" class="btn-admin-secondary">Edit Kontak &#10095;</a>
             <button type="submit" class="btn-admin-primary">Simpan Perubahan</button>
           </div>
         </div>
+      </form>
+      <form id="resetProfileForm" action="{{ route('admin.profil.reset') }}" method="POST" style="display: none;">
+        @csrf
       </form>
     </main>
 @endsection
