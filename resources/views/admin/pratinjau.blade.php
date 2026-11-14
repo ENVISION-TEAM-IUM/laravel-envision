@@ -14,8 +14,12 @@
 
       <h1 class="section-title" style="font-size: 32px;">Periksa sebelum diterbitkan</h1>
       <p class="section-desc">Pastikan perubahan sudah benar sebelum tampil di website.</p>
+      @if (session('success'))
+        <div class="admin-alert" style="display: flex; background: #e8f5e9; border: 1px solid #c8e6c9; color: #2e7d32; padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 600;">
+          {{ session('success') }}
+        </div>
+      @endif
 
-      <!-- Banner Status Pemeriksaan -->
       <div class="admin-panel-card" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
         <div style="display: flex; align-items: center; gap: 16px;">
           <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--green-tint); color: var(--green-primary); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; flex-shrink: 0;">
@@ -44,32 +48,46 @@
           <div class="admin-panel-card" style="margin-bottom: 0; padding: 24px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border-subtle);">
               <div style="font-size: 14px; font-weight: 700; color: var(--text-muted);">Desa Wisata Karangkemiri</div>
-              <span class="badge-tayang">Pratinjau Beranda</span>
+              <span class="{{ $beranda->status === 'Tayang' ? 'badge-tayang' : 'badge-draf' }}">Beranda: {{ $beranda->status }}</span>
             </div>
 
             <!-- Mini Hero Preview -->
             <div style="background: var(--green-primary); color: #ffffff; border-radius: 20px; padding: 28px 24px; margin-bottom: 16px;">
               <div style="font-size: 22px; font-weight: 800; line-height: 1.25; margin-bottom: 8px;">
-                Jelajahi Desa Wisata Karangkemiri
+                {{ $beranda->hero_title }}
               </div>
               <div style="font-size: 14px; color: rgba(255,255,255,0.88);">
-                Wisata alam, edukasi, dan UMKM lokal
+                {{ $beranda->hero_subtitle }}
+              </div>
+              <div style="margin-top: 12px; display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 99px; font-size: 12.5px; font-weight: 700;">
+                Tombol: {{ $beranda->button_text }}
               </div>
             </div>
-
             <!-- Featured Destination Preview -->
-            <div style="background: var(--bg-cream); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-              <div>
-                <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Destinasi unggulan</div>
-                <div style="font-size: 15px; font-weight: 800; color: var(--text-dark); margin-top: 2px;">
-                  Wahana Edukasi &amp; Outbound Candi
+            @php
+              $featured = (array) ($beranda->featured_destinations ?? []);
+              $featuredItems = $destinations->whereIn('slug', $featured);
+            @endphp
+            @forelse ($featuredItems as $f)
+              <div style="background: var(--bg-cream); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px;">
+                <div>
+                  <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Destinasi unggulan</div>
+                  <div style="font-size: 15px; font-weight: 800; color: var(--text-dark); margin-top: 2px;">
+                    {{ $f->nama }}
+                  </div>
                 </div>
+                <a href="{{ url('/detail-destinasi.html?slug='.$f->slug) }}" target="_blank" class="admin-edit-link">Lihat &#10095;</a>
               </div>
-              <a href="{{ url('/detail-destinasi.html?slug=candi') }}" target="_blank" class="admin-edit-link">Lihat &#10095;</a>
+            @empty
+              <div style="font-size: 13.5px; color: var(--text-muted); padding: 12px 0;">Belum ada destinasi unggulan yang dipilih.</div>
+            @endforelse
+
+            <div style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border-subtle); font-size: 13px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px;">
+              <div><strong>Profil Desa:</strong> {{ $profil->title }} (<span class="{{ $profil->status === 'Tayang' ? 'badge-tayang' : 'badge-draf' }}" style="padding: 2px 8px; font-size: 11px;">{{ $profil->status }}</span>)</div>
+              <div><strong>Kontak Resmi:</strong> WA {{ $kontak->whatsapp }} &bull; {{ $kontak->email }}</div>
             </div>
           </div>
         </div>
-
         <!-- Langkah menerbitkan -->
         <div>
           <h2 class="section-title" style="font-size: 20px; margin-bottom: 12px;">Langkah menerbitkan</h2>
@@ -90,12 +108,18 @@
             </div>
 
             <div class="admin-btn-row" style="margin-top: 0;">
-              <button type="button" class="btn-admin-secondary" onclick="showCustomPopup('Tersimpan sebagai Draf', 'Perubahan berhasil disimpan sebagai Draf dan belum ditampilkan ke pengunjung.', 'Mengerti')">
-                Simpan sebagai Draf
-              </button>
-              <button type="button" class="btn-admin-primary" onclick="showCustomPopup('Berhasil Diterbitkan!', 'Selamat! Seluruh perubahan berhasil diterbitkan ke Website Publik Desa Wisata Karangkemiri.', 'Selesai')">
-                Terbitkan ke Website
-              </button>
+              <form action="{{ route('admin.pratinjau.draft') }}" method="POST" style="margin: 0;">
+                @csrf
+                <button type="submit" class="btn-admin-secondary">
+                  Simpan sebagai Draf
+                </button>
+              </form>
+              <form action="{{ route('admin.pratinjau.publish') }}" method="POST" style="margin: 0;">
+                @csrf
+                <button type="submit" class="btn-admin-primary">
+                  Terbitkan ke Website
+                </button>
+              </form>
             </div>
           </div>
         </div>

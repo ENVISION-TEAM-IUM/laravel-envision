@@ -136,9 +136,11 @@
           <div class="site-footer-bottom-links">
             <a href="{{ url('/') }}" target="_blank" rel="noopener noreferrer">Website Publik</a>
             <span>&bull;</span>
-            <a href="{{ url('/admin-profil.html') }}">Profil Desa</a>
+            <a href="{{ route('admin.profil') }}">Profil Desa</a>
             <span>&bull;</span>
-            <a href="{{ url('/admin-pratinjau.html') }}">Pratinjau</a>
+            <a href="{{ route('admin.kontak') }}">Kontak &amp; Lokasi</a>
+            <span>&bull;</span>
+            <a href="{{ route('admin.pratinjau') }}">Pratinjau</a>
           </div>
         </div>
       </div>
@@ -288,6 +290,22 @@
             </span>
             <span class="sidebar-text">Kelola Katalog UMKM</span>
             <span class="sidebar-tooltip">Kelola Katalog UMKM</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="{{ route('admin.kontak') }}" class="{{ $drawerActive === 'kontak' ? 'active' : '' }}" data-tooltip="Edit Kontak & Lokasi">
+            <span class="sidebar-chevron">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </span>
+            <span class="sidebar-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+            </span>
+            <span class="sidebar-text">Edit Kontak &amp; Lokasi</span>
+            <span class="sidebar-tooltip">Edit Kontak &amp; Lokasi</span>
           </a>
         </li>
 

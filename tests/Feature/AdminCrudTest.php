@@ -119,6 +119,7 @@ class AdminCrudTest extends TestCase
             'foto' => 'storage/destinasi/old_foto.jpg',
         ]);
     }
+
     public function test_admin_can_update_destinasi_with_new_photo(): void
     {
         Storage::fake('public');
@@ -160,7 +161,6 @@ class AdminCrudTest extends TestCase
         $newPath = str_replace('storage/', '', $dest->foto);
         Storage::disk('public')->assertExists($newPath);
     }
-
 
     public function test_admin_can_delete_destinasi(): void
     {

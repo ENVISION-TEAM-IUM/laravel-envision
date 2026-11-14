@@ -2,10 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\BerandaSetting;
 use App\Models\Destinasi;
+use App\Models\KontakDesa;
 use App\Models\PaketWisata;
 use App\Models\ProdukUmkm;
+use App\Models\ProfilDesa;
 use App\Models\Umkm;
+use App\Models\GaleriFoto;
 use Illuminate\Database\Seeder;
 
 class ContentSeeder extends Seeder
@@ -117,5 +121,73 @@ class ContentSeeder extends Seeder
                 'deskripsi' => 'Tahu gurih dan lembut khas olahan pengrajin desa, digoreng renyah atau untuk masakan keluarga.',
             ]
         );
+
+        // 5. Beranda Settings
+        BerandaSetting::firstOrCreate([], BerandaSetting::defaultAttributes());
+
+        // 6. Profil Desa
+        ProfilDesa::firstOrCreate([], ProfilDesa::defaultAttributes());
+
+        // 7. Kontak & Lokasi Desa
+        KontakDesa::firstOrCreate([], KontakDesa::defaultAttributes());
+
+        // 8. Galeri Foto Dokumentasi & Tradisi
+        $galeriItems = [
+            [
+                'judul' => 'Ketapel & Panahan Outbound',
+                'kategori' => 'wisata',
+                'foto' => 'assets/images/ketapel-panahan.jpeg',
+                'keterangan' => 'Wahana permainan ketangkasan outbound Candi Karangkemiri.',
+                'urutan' => 1,
+                'status' => 'Tayang',
+            ],
+            [
+                'judul' => 'Penghargaan LDWN Peringkat ke-13 Nasional 2023',
+                'kategori' => 'tradisi',
+                'foto' => 'assets/images/penghargaan-ldwn-peringkat-ke-13-nasional-2023.jpeg',
+                'keterangan' => 'Prestasi membanggakan Desa Wisata Karangkemiri di tingkat nasional.',
+                'urutan' => 2,
+                'status' => 'Tayang',
+            ],
+            [
+                'judul' => 'Wahana Flying Fox Candi',
+                'kategori' => 'wisata',
+                'foto' => 'assets/images/flying-fox-2.jpeg',
+                'keterangan' => 'Sensasi meluncur di atas pepohonan hijau yang sejuk.',
+                'urutan' => 3,
+                'status' => 'Tayang',
+            ],
+            [
+                'judul' => 'Tradisi Budaya Sadranan',
+                'kategori' => 'tradisi',
+                'foto' => 'assets/images/sadranan.jpeg',
+                'keterangan' => 'Pelestarian adat dan budaya leluhur masyarakat desa.',
+                'urutan' => 4,
+                'status' => 'Tayang',
+            ],
+            [
+                'judul' => 'Kegiatan Outbound Candi',
+                'kategori' => 'wisata',
+                'foto' => 'assets/images/outbound.jpeg',
+                'keterangan' => 'Kegiatan edukatif kelompok dan instansi.',
+                'urutan' => 5,
+                'status' => 'Tayang',
+            ],
+            [
+                'judul' => 'Area Camping Ground & Alam',
+                'kategori' => 'wisata',
+                'foto' => 'assets/images/camping-ground.jpeg',
+                'keterangan' => 'Bumi perkemahan asri berlatar perbukitan hijau.',
+                'urutan' => 6,
+                'status' => 'Tayang',
+            ],
+        ];
+
+        foreach ($galeriItems as $item) {
+            GaleriFoto::updateOrCreate(
+                ['judul' => $item['judul']],
+                $item
+            );
+        }
     }
 }

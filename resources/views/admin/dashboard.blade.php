@@ -19,19 +19,19 @@
       <!-- 4 Ringkasan Konten CMS -->
       <div class="admin-stats-grid">
         <div class="admin-stat-card">
-          <div class="admin-stat-num">10</div>
-          <div class="admin-stat-label">Halaman website</div>
+          <div class="admin-stat-num">{{ $totalKunjungan ?? 0 }}</div>
+          <div class="admin-stat-label">Total Kunjungan Web</div>
         </div>
         <div class="admin-stat-card">
           <div class="admin-stat-num">{{ $totalDestinasi ?? 4 }}</div>
           <div class="admin-stat-label">Destinasi wisata</div>
         </div>
         <div class="admin-stat-card">
-          <div class="admin-stat-num" id="dashTotalPackages">{{ $totalPaket ?? 1 }}</div>
+          <div class="admin-stat-num" id="dashTotalPackages" data-server-rendered="true">{{ $totalPaket ?? 0 }}</div>
           <div class="admin-stat-label">Paket wisata aktif</div>
         </div>
         <div class="admin-stat-card">
-          <div class="admin-stat-num" id="dashTotalUmkm">{{ $totalUmkm ?? 1 }}</div>
+          <div class="admin-stat-num" id="dashTotalUmkm" data-server-rendered="true">{{ $totalUmkm ?? 0 }}</div>
           <div class="admin-stat-label">Unit UMKM terdaftar</div>
         </div>
       </div>
@@ -111,6 +111,41 @@
               <!-- Rendered by JS -->
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- Seksi Masukan & Evaluasi Layanan Pengunjung -->
+      <section style="margin: 28px 0 32px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+          <div>
+            <div class="eyebrow" style="color: var(--green-dark);">EVALUASI BUMDES</div>
+            <h2 class="section-title" style="font-size: 22px; margin-bottom: 0;">Masukan Layanan Pengunjung ({{ $totalFeedback ?? 0 }})</h2>
+          </div>
+        </div>
+
+        <div class="admin-panel-card" style="padding: 20px;">
+          @forelse ($recentFeedbacks ?? [] as $fb)
+            <div style="border-bottom: 1px solid var(--border-light); padding: 12px 0; {{ $loop->last ? 'border-bottom: none;' : '' }}">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px;">
+                <span style="font-weight: 700; color: var(--text-dark); font-size: 14.5px;">📍 {{ $fb->nama_destinasi }}</span>
+                <span style="font-size: 12px; color: var(--text-muted);">{{ $fb->created_at?->diffForHumans() ?? 'Baru saja' }} {{ $fb->asal_kota ? '• ' . $fb->asal_kota : '' }}</span>
+              </div>
+              <div style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-muted); margin-bottom: 6px;">
+                <span>Fasilitas: <strong>{{ $fb->rating_fasilitas }}/5 ⭐</strong></span>
+                <span>Kebersihan: <strong>{{ $fb->rating_kebersihan }}/5 ⭐</strong></span>
+                <span>Pelayanan: <strong>{{ $fb->rating_pelayanan }}/5 ⭐</strong></span>
+              </div>
+              @if ($fb->komentar)
+                <p style="font-size: 13.5px; color: var(--text-body); background: var(--surface-light, #f9fafb); padding: 8px 12px; border-radius: 8px; margin: 4px 0 0;">
+                  "{{ $fb->komentar }}"
+                </p>
+              @endif
+            </div>
+          @empty
+            <div style="text-align: center; padding: 24px 10px; color: var(--text-muted); font-size: 14px;">
+              Belum ada masukan pengunjung yang masuk. Masukan akan otomatis tersimpan di database dan tampil di sini saat pengunjung mengirim evaluasi dari halaman detail destinasi.
+            </div>
+          @endforelse
         </div>
       </section>
 

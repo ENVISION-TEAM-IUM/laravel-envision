@@ -9,18 +9,16 @@
       <!-- Hero Banner dengan Gambar Asli Desa Wisata Karangkemiri -->
       <section class="hero-card hero-home" style="background-image: linear-gradient(180deg, rgba(14, 68, 33, 0.35) 0%, rgba(14, 68, 33, 0.85) 100%), url('{{ asset('assets/images/desa-wisata-karangkemiri-2.jpeg') }}'); background-size: cover; background-position: center;">
         <h1 class="hero-title">
-          Jelajahi<br>
-          Desa Wisata<br>
-          Karangkemiri
+          {!! nl2br(e($beranda->hero_title ?? "Jelajahi\nDesa Wisata\nKarangkemiri")) !!}
         </h1>
         <p class="hero-subtitle">
-          Pengalaman wisata berbasis masyarakat yang memadukan alam, budaya, edukasi, dan rekreasi. Rasakan suasana pedesaan yang asri dengan hamparan persawahan dan udara yang sejuk.
+          {{ $beranda->hero_subtitle ?? 'Pengalaman wisata berbasis masyarakat yang memadukan alam, budaya, edukasi, dan rekreasi. Rasakan suasana pedesaan yang asri dengan hamparan persawahan dan udara yang sejuk.' }}
         </p>
       </section>
 
       <!-- Primary CTA: Reservasi Sekarang -->
       <a href="{{ url('/paket-wisata.html') }}" class="btn-cta-indigo">
-        <span>Reservasi Sekarang</span>
+        <span>{{ $beranda->button_text ?? 'Reservasi Sekarang' }}</span>
       </a>
 
       <!-- Pintasan Jelajah -->
@@ -37,27 +35,28 @@
         <h2 class="section-title">Destinasi unggulan</h2>
 
         <div class="cards-stack">
-          <!-- Card 1: Candi -->
-          <a href="{{ url('/detail-destinasi.html?slug=candi') }}" class="horiz-card">
-            <div class="thumb-box" style="background-image: linear-gradient(180deg, rgba(14, 68, 33, 0.15) 0%, rgba(14, 68, 33, 0.72) 100%), url('{{ asset('assets/images/candi.png') }}'); background-size: cover; background-position: center;">
-              <span>Candi</span>
-            </div>
-            <div class="card-body">
-              <h3 class="card-title">Wahana Edukasi &amp; Outbound Candi</h3>
-              <p class="card-subtitle">Aktivitas keluarga dan rombongan</p>
-            </div>
-          </a>
-
-          <!-- Card 2: Embung -->
-          <a href="{{ url('/detail-destinasi.html?slug=embung') }}" class="horiz-card">
-            <div class="thumb-box" style="background-image: linear-gradient(180deg, rgba(14, 68, 33, 0.15) 0%, rgba(14, 68, 33, 0.72) 100%), url('{{ asset('assets/images/camping-ground.jpeg') }}'); background-size: cover; background-position: center;">
-              <span>Embung</span>
-            </div>
-            <div class="card-body">
-              <h3 class="card-title">Embung Prabawulan</h3>
-              <p class="card-subtitle">Wisata alam dan budidaya ikan</p>
-            </div>
-          </a>
+          @forelse ($destinasiUnggulan as $du)
+            <a href="{{ url('/detail-destinasi.html?slug=' . $du->slug) }}" class="horiz-card">
+              <div class="thumb-box" style="background-image: linear-gradient(180deg, rgba(14, 68, 33, 0.15) 0%, rgba(14, 68, 33, 0.72) 100%), url('{{ asset($du->foto ?: 'assets/images/candi.png') }}'); background-size: cover; background-position: center;">
+                <span>{{ Str::limit($du->nama, 12) }}</span>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">{{ $du->nama }}</h3>
+                <p class="card-subtitle">{{ Str::limit($du->deskripsi, 85) }}</p>
+              </div>
+            </a>
+          @empty
+            <!-- Fallback Default Destinasi -->
+            <a href="{{ url('/detail-destinasi.html?slug=candi') }}" class="horiz-card">
+              <div class="thumb-box" style="background-image: linear-gradient(180deg, rgba(14, 68, 33, 0.15) 0%, rgba(14, 68, 33, 0.72) 100%), url('{{ asset('assets/images/candi.png') }}'); background-size: cover; background-position: center;">
+                <span>Candi</span>
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">Wahana Edukasi &amp; Outbound Candi</h3>
+                <p class="card-subtitle">Aktivitas keluarga dan rombongan</p>
+              </div>
+            </a>
+          @endforelse
         </div>
       </section>
 
@@ -66,24 +65,24 @@
         <div class="eyebrow">DOKUMENTASI KEGIATAN</div>
         <h2 class="section-title" style="margin-bottom: 14px;">Galeri Wisata</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px;">
-          <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
-            <img src="{{ asset('assets/images/ketapel-panahan.jpeg') }}" alt="Ketapel & Panahan Outbound" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-          </div>
-          <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
-            <img src="{{ asset('assets/images/penghargaan-ldwn-peringkat-ke-13-nasional-2023.jpeg') }}" alt="Penghargaan LDWN Peringkat ke-13 Nasional 2023" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-          </div>
-          <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
-            <img src="{{ asset('assets/images/flying-fox-2.jpeg') }}" alt="Wahana Flying Fox" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-          </div>
-          <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
-            <img src="{{ asset('assets/images/camping-ground.jpeg') }}" alt="Camping Ground Karangkemiri" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-          </div>
-          <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
-            <img src="{{ asset('assets/images/outbound.jpeg') }}" alt="Kegiatan Outbound Rombongan" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-          </div>
-          <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
-            <img src="{{ asset('assets/images/sadranan.jpeg') }}" alt="Tradisi Budaya Sadranan" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-          </div>
+          @forelse ($galeriList ?? [] as $g)
+            <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
+              <img src="{{ asset($g->foto) }}" alt="{{ $g->judul }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            </div>
+          @empty
+            <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
+              <img src="{{ asset('assets/images/ketapel-panahan.jpeg') }}" alt="Ketapel & Panahan Outbound" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            </div>
+            <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
+              <img src="{{ asset('assets/images/penghargaan-ldwn-peringkat-ke-13-nasional-2023.jpeg') }}" alt="Penghargaan LDWN Peringkat ke-13 Nasional 2023" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            </div>
+            <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
+              <img src="{{ asset('assets/images/flying-fox-2.jpeg') }}" alt="Wahana Flying Fox" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            </div>
+            <div style="border-radius: 16px; overflow: hidden; border: 1px solid var(--border-subtle); height: 185px;">
+              <img src="{{ asset('assets/images/camping-ground.jpeg') }}" alt="Camping Ground Karangkemiri" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            </div>
+          @endforelse
         </div>
       </section>
 
