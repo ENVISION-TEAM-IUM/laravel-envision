@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use DOMDocument;
+use DOMXPath;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
@@ -15,7 +17,7 @@ class ExampleTest extends TestCase
         $response = $this->get('/');
         $response->assertStatus(200);
         $response->assertSee('Beranda - Desa Wisata Karangkemiri');
-        $response->assertSee('class="active">Beranda</a>', false);
+        $this->assertActiveNavigation($response->getContent(), '/');
     }
 
     public function test_index_html_redirects_to_home(): void
@@ -33,7 +35,7 @@ class ExampleTest extends TestCase
         $resHtml = $this->get('/profil.html');
         $resHtml->assertStatus(200);
         $resHtml->assertSee('Profil Desa Wisata - Desa Wisata Karangkemiri');
-        $resHtml->assertSee('class="active">Profil Desa</a>', false);
+        $this->assertActiveNavigation($resHtml->getContent(), '/profil.html');
     }
 
     public function test_destinasi_routes_return_successful_response(): void
@@ -45,7 +47,7 @@ class ExampleTest extends TestCase
         $resHtml = $this->get('/destinasi.html');
         $resHtml->assertStatus(200);
         $resHtml->assertSee('Destinasi Wisata - Desa Wisata Karangkemiri');
-        $resHtml->assertSee('class="active">Destinasi</a>', false);
+        $this->assertActiveNavigation($resHtml->getContent(), '/destinasi.html');
     }
 
     public function test_detail_destinasi_routes_return_successful_response(): void
@@ -68,19 +70,19 @@ class ExampleTest extends TestCase
         $resHtml = $this->get('/paket-wisata.html');
         $resHtml->assertStatus(200);
         $resHtml->assertSee('Paket Wisata - Desa Wisata Karangkemiri');
-        $resHtml->assertSee('class="active">Paket</a>', false);
+        $this->assertActiveNavigation($resHtml->getContent(), '/paket-wisata.html');
     }
 
     public function test_katalog_umkm_routes_return_successful_response(): void
     {
         $resClean = $this->get('/katalog-umkm');
         $resClean->assertStatus(200);
-        $resClean->assertSee('Katalog UMKM - Desa Wisata Karangkemiri');
+        $resClean->assertSee('Katalog UMKM &amp; Produk Lokal - Desa Wisata Karangkemiri', false);
 
         $resHtml = $this->get('/katalog-umkm.html');
         $resHtml->assertStatus(200);
-        $resHtml->assertSee('Katalog UMKM - Desa Wisata Karangkemiri');
-        $resHtml->assertSee('class="active">UMKM</a>', false);
+        $resHtml->assertSee('Katalog UMKM &amp; Produk Lokal - Desa Wisata Karangkemiri', false);
+        $this->assertActiveNavigation($resHtml->getContent(), '/katalog-umkm.html');
     }
 
     public function test_kontak_routes_return_successful_response(): void
@@ -92,7 +94,7 @@ class ExampleTest extends TestCase
         $resHtml = $this->get('/kontak.html');
         $resHtml->assertStatus(200);
         $resHtml->assertSee('Kontak &amp; Lokasi - Desa Wisata Karangkemiri', false);
-        $resHtml->assertSee('class="active">Kontak</a>', false);
+        $this->assertActiveNavigation($resHtml->getContent(), '/kontak.html');
     }
 
     // ==========================================
@@ -105,75 +107,38 @@ class ExampleTest extends TestCase
         $resClean->assertStatus(200);
         $resClean->assertSee('Login Admin CMS - Desa Wisata Karangkemiri');
 
-        $resHtml = $this->get('/admin-login.html');
-        $resHtml->assertStatus(200);
-        $resHtml->assertSee('Masuk ke CMS');
+        $this->get('/admin-login.html')->assertRedirect('/admin/login');
+        $this->get('/admin-login')->assertRedirect('/admin/login');
     }
 
-    public function test_admin_dashboard_routes_return_successful_response(): void
+    public function test_admin_pages_require_authentication(): void
     {
-        $resClean = $this->get('/admin/dashboard');
-        $resClean->assertStatus(200);
-        $resClean->assertSee('Dashboard Admin - Desa Wisata Karangkemiri');
-
-        $resHtml = $this->get('/admin-dashboard.html');
-        $resHtml->assertStatus(200);
-        $resHtml->assertSee('Halo, Admin!');
+        foreach ([
+            '/admin/dashboard', '/admin-dashboard.html', '/admin-beranda.html',
+            '/admin-destinasi.html', '/admin-edit-destinasi.html?slug=candi',
+            '/admin-paket.html', '/admin-umkm.html', '/admin-profil.html',
+            '/admin-kontak.html', '/admin-pratinjau.html',
+        ] as $uri) {
+            $this->get($uri)->assertRedirect('/admin/login');
+        }
     }
 
-    public function test_admin_beranda_routes_return_successful_response(): void
+    private function assertActiveNavigation(string $html, string $path): void
     {
-        $response = $this->get('/admin-beranda.html');
-        $response->assertStatus(200);
-        $response->assertSee('Edit Halaman Beranda - Admin CMS Karangkemiri');
-    }
-
-    public function test_admin_destinasi_routes_return_successful_response(): void
-    {
-        $response = $this->get('/admin-destinasi.html');
-        $response->assertStatus(200);
-        $response->assertSee('Kelola Destinasi Wisata - Admin CMS Karangkemiri');
-    }
-
-    public function test_admin_edit_destinasi_routes_return_successful_response(): void
-    {
-        $response = $this->get('/admin-edit-destinasi.html?slug=candi');
-        $response->assertStatus(200);
-        $response->assertSee('Edit Informasi Destinasi - Admin CMS Karangkemiri');
-    }
-
-    public function test_admin_paket_routes_return_successful_response(): void
-    {
-        $response = $this->get('/admin-paket.html');
-        $response->assertStatus(200);
-        $response->assertSee('Kelola Paket Wisata - Admin CMS Karangkemiri');
-    }
-
-    public function test_admin_umkm_routes_return_successful_response(): void
-    {
-        $response = $this->get('/admin-umkm.html');
-        $response->assertStatus(200);
-        $response->assertSee('Kelola Katalog UMKM - Admin CMS Karangkemiri');
-    }
-
-    public function test_admin_profil_routes_return_successful_response(): void
-    {
-        $response = $this->get('/admin-profil.html');
-        $response->assertStatus(200);
-        $response->assertSee('Edit Profil Desa - Admin CMS Karangkemiri');
-    }
-
-    public function test_admin_kontak_routes_return_successful_response(): void
-    {
-        $response = $this->get('/admin-kontak.html');
-        $response->assertStatus(200);
-        $response->assertSee('Edit Kontak &amp; Lokasi - Admin CMS Karangkemiri', false);
-    }
-
-    public function test_admin_pratinjau_routes_return_successful_response(): void
-    {
-        $response = $this->get('/admin-pratinjau.html');
-        $response->assertStatus(200);
-        $response->assertSee('Pratinjau &amp; Publikasi - Admin CMS Karangkemiri', false);
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $document = new DOMDocument;
+            $document->loadHTML($html);
+            $xpath = new DOMXPath($document);
+            $links = $xpath->query('//a[contains(concat(" ", normalize-space(@class), " "), " active ")]');
+            $hrefs = [];
+            foreach ($links as $link) {
+                $hrefs[] = $link->getAttribute('href');
+            }
+            $this->assertContains(url($path), $hrefs);
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
     }
 }
